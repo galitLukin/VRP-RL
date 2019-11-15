@@ -1,7 +1,7 @@
 import argparse
 import os
 import numpy as np
-from tqdm import tqdm 
+from tqdm import tqdm
 import tensorflow as tf
 import time
 
@@ -14,15 +14,7 @@ def load_task_specific_components(task):
     '''
     This function load task-specific libraries
     '''
-    if task == 'tsp':
-        from TSP.tsp_utils import DataGenerator, Env ,reward_func
-        from shared.attention import Attention
-
-        AttentionActor = Attention
-        AttentionCritic = Attention
-
-
-    elif task == 'vrp':
+    if task == 'vrp':
         from VRP.vrp_utils import DataGenerator,Env,reward_func
         from VRP.vrp_attention import AttentionVRPActor,AttentionVRPCritic
 
@@ -59,6 +51,9 @@ def main(args, prt):
     agent.Initialize(sess)
 
     # train or evaluate
+    prev_actor_loss, prev_critic_loss = float('Inf'), float('Inf')
+    curr_actor_loss, curr_critic_loss = 0, 0
+    actor_eps, critic_eps = 1e-2, 1e-2
     start_time = time.time()
     if args['is_train']:
         prt.print_out('Training started ...')
@@ -67,6 +62,21 @@ def main(args, prt):
             summary = agent.run_train_step()
             _, _ , actor_loss_val, critic_loss_val, actor_gra_and_var_val, critic_gra_and_var_val,\
                 R_val, v_val, logprobs_val,probs_val, actions_val, idxs_val= summary
+
+            curr_actor_loss = np.mean(actor_loss_val)
+            curr_critic_loss = np.mean(critic_loss_val)
+            if abs(prev_actor_loss - curr_actor_loss) < actor_eps \
+                and abs(prev_critic_loss - curr_critic_loss) < critic_eps:
+                prt.print_out('Converged at step {}'\
+                      .format(step))
+                train_time_end = time.time()-train_time_beg
+                prt.print_out('Train Step: {} -- Time: {} -- Train reward: {} -- Value: {}'\
+                      .format(step,time.strftime("%H:%M:%S", time.gmtime(\
+                        train_time_end)),np.mean(R_val),np.mean(v_val)))
+                prt.print_out('    actor loss: {} -- critic loss: {}'\
+                      .format(curr_actor_loss,curr_critic_loss))
+                train_time_beg = time.time()
+                break
 
             if step%args['save_interval'] == 0:
                 agent.saver.save(sess,args['model_dir']+'/model.ckpt', global_step=step)
@@ -77,10 +87,13 @@ def main(args, prt):
                       .format(step,time.strftime("%H:%M:%S", time.gmtime(\
                         train_time_end)),np.mean(R_val),np.mean(v_val)))
                 prt.print_out('    actor loss: {} -- critic loss: {}'\
-                      .format(np.mean(actor_loss_val),np.mean(critic_loss_val)))
+                      .format(curr_actor_loss, curr_critic_loss))
+
                 train_time_beg = time.time()
             if step%args['test_interval'] == 0:
                 agent.inference(args['infer_type'])
+            prev_actor_loss = curr_actor_loss
+            prev_critic_loss = curr_critic_loss
 
     else: # inference
         prt.print_out('Evaluation started ...')

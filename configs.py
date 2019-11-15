@@ -1,5 +1,5 @@
 import argparse
-import shared.misc_utils as utils 
+import shared.misc_utils as utils
 import os
 from task_specific_params import task_lst
 
@@ -11,7 +11,7 @@ def initialize_task_settings(args,task):
     try:
         task_params = task_lst[task]
     except:
-        raise Exception('Task is not implemented.') 
+        raise Exception('Task is not implemented.')
 
     for name, value in task_params._asdict().items():
     	args[name] = value
@@ -29,7 +29,7 @@ def ParseParams():
     parser = argparse.ArgumentParser(description="Neural Combinatorial Optimization with RL")
 
     # Data
-    parser.add_argument('--task', default='vrp10', help="Select the task to solve; i.e. tsp10")
+    parser.add_argument('--task', default='vrp10', help="Select the task to solve; i.e. vrp10")
     parser.add_argument('--batch_size', default=128,type=int, help='Batch size in training')
     parser.add_argument('--n_train', default=260000,type=int, help='Number of training steps')
     parser.add_argument('--test_size', default=1000,type=int, help='Number of problems in test set')
@@ -39,13 +39,13 @@ def ParseParams():
     parser.add_argument('--forget_bias', default=1.0,type=float, help="Forget bias for BasicLSTMCell.")
     parser.add_argument('--embedding_dim', default=128,type=int, help='Dimension of input embedding')
     parser.add_argument('--hidden_dim', default=128,type=int, help='Dimension of hidden layers in Enc/Dec')
-    parser.add_argument('--n_process_blocks', default=3,type=int,                     
+    parser.add_argument('--n_process_blocks', default=3,type=int,
                         help='Number of process block iters to run in the Critic network')
     parser.add_argument('--rnn_layers', default=1, type=int, help='Number of LSTM layers in the encoder and decoder')
-    parser.add_argument('--decode_len', default=None,type=int,                     
+    parser.add_argument('--decode_len', default=None,type=int,
                         help='Number of time steps the decoder runs before stopping')
     parser.add_argument('--n_glimpses', default=0, type=int, help='Number of glimpses to use in the attention')
-    parser.add_argument('--tanh_exploration', default=10.,  type=float,                   
+    parser.add_argument('--tanh_exploration', default=10.,  type=float,
              help='Hyperparam controlling exploration in the net by scaling the tanh in the softmax')
     parser.add_argument('--use_tanh', type=str2bool, default=False, help='')
     parser.add_argument('--mask_glimpses', type=str2bool, default=True, help='')
@@ -62,7 +62,7 @@ def ParseParams():
     # parser.add_argument('--loss_type', type=int, default=1, help='1,2,3')
 
     # inference
-    parser.add_argument('--infer_type', default='batch', 
+    parser.add_argument('--infer_type', default='batch',
         help='single|batch: do inference for the problems one-by-one, or run it all at once')
     parser.add_argument('--beam_width', default=10, type=int, help='')
 
@@ -77,7 +77,7 @@ def ParseParams():
     parser.add_argument('--model_dir', type=str, default='')
     parser.add_argument('--load_path', type=str, default='', help='Path to load trained variables')
     parser.add_argument('--disable_tqdm', default=True, type=str2bool)
-                        
+
     args, unknown = parser.parse_known_args()
     args = vars(args)
 
@@ -93,10 +93,10 @@ def ParseParams():
         pass
 
     # create a print handler
-    out_file = open(os.path.join(args['log_dir'], 'results.txt'),'w+') 
+    out_file = open(os.path.join(args['log_dir'], 'results.txt'),'w+')
     prt = utils.printOut(out_file,args['stdout_print'])
 
-    os.environ["CUDA_VISIBLE_DEVICES"]=  args['gpu'] 
+    os.environ["CUDA_VISIBLE_DEVICES"]=  args['gpu']
 
     args = initialize_task_settings(args,args['task'])
 
@@ -105,4 +105,3 @@ def ParseParams():
         prt.print_out("{}: {}".format(key,value))
 
     return args, prt
-

@@ -1,11 +1,11 @@
 
 # Reinforcement Learning for Solving the Vehicle Routing Problem
 
-We use Reinforcement for solving Travelling Salesman Problem (TSP) and Vehicle Routing Problem (VRP).
+We use Reinforcement for solving Vehicle Routing Problem (VRP).
 
 
 ## Paper
-Implementation of our paper: [Reinforcement Learning for Solving the Vehicle Routing Problem](https://arxiv.org/abs/1802.04240v2). 
+Implementation of our paper: [Reinforcement Learning for Solving the Vehicle Routing Problem](https://arxiv.org/abs/1802.04240v2).
 
 ## Dependencies
 
@@ -23,7 +23,7 @@ python main.py --task=vrp10
 
 It is possible to add other config parameters like:
 ```bash
-python main.py --task=vrp10 --gpu=0 --n_glimpses=1 --use_tanh=False 
+python main.py --task=vrp10 --gpu=0 --n_glimpses=1 --use_tanh=False
 ```
 There is a full list of all configs in the ``config.py`` file. Also, task specific parameters are available in ``task_specific_params.py``
 ### Inference
