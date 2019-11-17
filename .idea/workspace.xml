@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5f057827-1d25-4475-a6bc-c9f33a5bf83c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/VRP/vrp_attention.py" beforeDir="false" afterPath="$PROJECT_DIR$/VRP/vrp_attention.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VRP/vrp_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/VRP/vrp_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/attention_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/model/attention_agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/decode_step.py" beforeDir="false" afterPath="$PROJECT_DIR$/shared/decode_step.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,6 +25,7 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="checkpoint" value="1" />
+          <entry key="gitignore" value="1" />
           <entry key="md" value="1" />
           <entry key="py" value="24" />
         </counts>
@@ -35,18 +33,20 @@
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="Markdown" value="1" />
-          <entry key="PLAIN_TEXT" value="1" />
+          <entry key="PLAIN_TEXT" value="2" />
           <entry key="Python" value="24" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="30" />
+          <entry key="gitignore" value="13" />
           <entry key="py" value="644" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
+          <entry key="PLAIN_TEXT" value="13" />
           <entry key="Python" value="674" />
         </counts>
       </usages-collector>
@@ -123,7 +123,7 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/model/attention_agent.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="-2200">
@@ -132,6 +132,15 @@
                     <element signature="e#0#23#0" expanded="true" />
                     <marker date="1572545399390" expanded="true" signature="13767:13776" ph="..." />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/.gitignore">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="270">
+                  <caret line="18" column="7" selection-start-line="18" selection-start-column="7" selection-end-line="18" selection-end-column="7" />
                 </state>
               </provider>
             </entry>
@@ -182,6 +191,7 @@
         <option value="$PROJECT_DIR$/model/attention_agent.py" />
         <option value="$PROJECT_DIR$/VRP/vrp_utils.py" />
         <option value="$PROJECT_DIR$/shared/decode_step.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -437,6 +447,13 @@
             <element signature="e#0#23#0" expanded="true" />
             <marker date="1572545399390" expanded="true" signature="13767:13776" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="7" selection-start-line="18" selection-start-column="7" selection-end-line="18" selection-end-column="7" />
         </state>
       </provider>
     </entry>
