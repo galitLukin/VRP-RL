@@ -226,7 +226,7 @@ class RLAgent(object):
                     # init states
                     initial_state = tf.zeros([args['rnn_layers'], 2, batch_size, args['hidden_dim']])
                     l = tf.unstack(initial_state, axis=0)
-                    rnn_tuple_state = tuple([tf.nn.rnn_cell.LSTMStateTuple(l[idx][0],l[idx][1])
+                    rnn_tuple_state = tuple([tf.nn.rnn_cell.LSTMStateTuple(l[idx][0],l[idx][1]) # index + corresponds to coord
                               for idx in range(args['rnn_layers'])])
 
                     hy = rnn_tuple_state[0][1]
@@ -261,7 +261,7 @@ class RLAgent(object):
         R = tf.stop_gradient(R)
 
         # losses
-        actor_loss = tf.reduce_mean(tf.multiply((R-v_nograd),tf.add_n(logprobs)),0)
+        actor_loss = tf.reduce_mean(tf.multiply((R-v_nograd),tf.add_n(logprobs)),0)     # compute mean over the zero axis
         critic_loss = tf.losses.mean_squared_error(R,v)
 
         # optimizers

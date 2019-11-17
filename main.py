@@ -32,7 +32,6 @@ def load_task_specific_components(task):
     else:
         raise Exception('Task is not implemented')
 
-
     return DataGenerator, Env, reward_func, AttentionActor, AttentionCritic
 
 def main(args, prt):

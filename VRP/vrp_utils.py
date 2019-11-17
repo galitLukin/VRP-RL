@@ -47,7 +47,7 @@ def create_VRP_dataset(
         # Generate a training set of size n_problems 
         x = rnd.uniform(0,1,size=(n_problems,n_nodes,2))
         d = rnd.randint(1,10,[n_problems,n_nodes,1])
-        d[:,-1]=0 # demand of depot
+        d[:,-1]=0 # demand of depo[
         data = np.concatenate([x,d],2)
         np.savetxt(fname, data.reshape(-1, n_nodes*3))
 
@@ -66,7 +66,6 @@ class DataGenerator(object):
                 args['n_nodes']: number of nodes
                 args['n_cust']: number of customers
                 args['batch_size']: batchsize for training
-
         '''
         self.args = args
         self.rnd = np.random.RandomState(seed= args['random_seed'])
@@ -220,7 +219,7 @@ class Env(object):
         d_sat = tf.minimum(tf.gather_nd(self.demand,batched_idx), self.load)
 
         # update the demand
-        d_scatter = tf.scatter_nd(batched_idx, d_sat, tf.cast(tf.shape(self.demand),tf.int64))
+        d_scatter = tf.scatter_nd(batched_idx, d_sat, tf.cast(tf.shape(self.demand),tf.int64))      # sparse tensor containing d_sat for the interesting idx
         self.demand = tf.subtract(self.demand, d_scatter)
 
         # update load
@@ -285,5 +284,6 @@ def reward_func(sample_solution):
 
     route_lens_decoded = tf.reduce_sum(tf.pow(tf.reduce_sum(tf.pow(\
         (sample_solution_tilted - sample_solution) ,2), 2) , .5), 0)
+
     return route_lens_decoded 
 

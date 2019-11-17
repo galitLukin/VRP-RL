@@ -207,7 +207,7 @@ class RNNDecodeStep(DecodeStep):
             decoder_state: the update decoder state.
         """
 
-#         decoder_inp = tf.reshape(decoder_inp,[-1,1,self.hidden_dim])
+        # decoder_inp = tf.reshape(decoder_inp,[-1,1,self.hidden_dim])
         _ , decoder_state = tf.nn.dynamic_rnn(self.cell,
                                               decoder_inp,
                                               initial_state=decoder_state,
