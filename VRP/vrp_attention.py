@@ -11,22 +11,22 @@ class AttentionVRPActor(object):
             self.v = tf.get_variable('v',[1,dim],
                        initializer=tf.contrib.layers.xavier_initializer())
             self.v = tf.expand_dims(self.v,2)
-            
-        self.emb_d = tf.layers.Conv1D(dim,1,_scope=_scope+_name+'/emb_d' ) #conv1d
+
+        self.emb_d = tf.layers.Conv1D(dim,1,_scope=_scope+_name+'/emb_d' ) #conv1d of kernel size = dim, stride = 1
         self.emb_ld = tf.layers.Conv1D(dim,1,_scope=_scope+_name+'/emb_ld' ) #conv1d_2
 
         self.project_d = tf.layers.Conv1D(dim,1,_scope=_scope+_name+'/proj_d' ) #conv1d_1
         self.project_ld = tf.layers.Conv1D(dim,1,_scope=_scope+_name+'/proj_ld' ) #conv1d_3
-        self.project_query = tf.layers.Dense(dim,_scope=_scope+_name+'/proj_q' ) #
+        self.project_query = tf.layers.Dense(dim,_scope=_scope+_name+'/proj_q' ) # fully connected layer, activation is linear
         self.project_ref = tf.layers.Conv1D(dim,1,_scope=_scope+_name+'/proj_ref' ) #conv1d_4
 
 
         self.C = C  # tanh exploration parameter
-        self.tanh = tf.nn.tanh
+        self.tanh = tf.nn.tanh      # activation function hyperbolique tangente (output in ]-1,1[
 
     def __call__(self, query, ref, env):
         """
-        This function gets a query tensor and ref rensor and returns the logit op.
+        This function gets a query tensor and ref tensor and returns the logit op.
         Args: 
             query: is the hidden state of the decoder at the current
                 time step. [batch_size x dim]
@@ -41,6 +41,7 @@ class AttentionVRPActor(object):
         demand = env.demand
         load = env.load
         max_time = tf.shape(demand)[1]
+
 
         # embed demand and project it
         # emb_d:[batch_size x max_time x dim ]
