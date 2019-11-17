@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
-import time
+import time, os
+from shutil import copyfile
 from shared.embeddings import LinearEmbedding
 from shared.decode_step import RNNDecodeStep
 
@@ -302,11 +303,14 @@ class RLAgent(object):
     def load_model(self):
         latest_ckpt = tf.train.latest_checkpoint(self.args['load_path'])
         if latest_ckpt is not None:
+            print("have load model")
             self.saver.restore(self.sess, latest_ckpt)
+
 
     def evaluate_single(self,eval_type='greedy'):
         start_time = time.time()
         avg_reward = []
+        all_output = []
 
         if eval_type == 'greedy':
             summary = self.val_summary_greedy
@@ -328,6 +332,12 @@ class RLAgent(object):
                 R_val = np.amin(R,1, keepdims = False)
                 R_ind0 = np.argmin(R,1)[0]
                 avg_reward.append(R_val)
+
+            # print decode in file data
+            example_output = [list(batch[0, self.env.n_nodes-1, :])] # we begin by the depot
+            for idx, action in enumerate(actions):
+                example_output.append(list(action[R_ind0*np.shape(batch)[0]]))
+            all_output.append(example_output)
 
 
             # sample decode
@@ -351,6 +361,50 @@ class RLAgent(object):
 
         self.prt.print_out("Finished evaluation with %d steps in %s." % (step\
                            ,time.strftime("%H:%M:%S", time.gmtime(end_time))))
+
+        # Ouputting the results
+        self._output_results(all_output,eval_type)
+
+
+    def _output_results(self,all_ouput,eval_type):
+        """
+        Output the deconding results obtained after a single inference
+        :param all_ouput: list of routes, in order
+        :param eval_type: the type (greedy or beam_search)
+        """
+        # create directory
+        dir_name = os.path.join(self.args['log_dir'],'results')
+        if not os.path.exists(dir_name):
+            os.mkdir(dir_name)
+
+        # build task name and datafiles
+        task_name = 'vrp-size-{}-len-{}-results-{}.txt'.format(self.args['test_size'], self.env.n_nodes,eval_type)
+        fname = os.path.join(self.args['log_dir'],'results', task_name)
+
+        input_file =open(fname, 'w')
+        for output in all_ouput:
+            depot_x = output[0][0]
+            depot_y = output[0][1]
+            nb_stop = 0
+            for node in output:
+                input_file.write(str(node[0]) + " " + str(node[1]) + " ")
+                # check if depot or stop
+                if abs(depot_x - node[0]) >= 0.001 or abs(depot_y - node[1]) >= 0.001:
+                    nb_stop +=1
+
+                if nb_stop == self.env.n_nodes -1:
+                    # we have found all the stops so write depot again and break
+                    input_file.write(str(depot_x) + " " + str(depot_y))
+                    break
+            input_file.write("\n")
+        input_file.close()
+
+        # copy the input file
+        copy_name = 'vrp-size-{}-len-{}-test.txt'.format(self.args['test_size'], self.env.n_nodes)
+        old_loc = os.path.join(self.args['data_dir'], copy_name)
+        new_loc = os.path.join(self.args['log_dir'],'results', copy_name)
+        copyfile(old_loc,new_loc)
+
 
 
     def evaluate_batch(self,eval_type='greedy'):

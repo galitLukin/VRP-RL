@@ -7,7 +7,8 @@ import time
 
 from configs import ParseParams
 
-from shared.decode_step import RNNDecodeStep
+from evaluation.eval_VRP import eval_google_or
+from evaluation.benchmark import benchmark
 from model.attention_agent import RLAgent
 
 def load_task_specific_components(task):
@@ -74,7 +75,6 @@ def main(args, prt):
                         train_time_end)),np.mean(R_val),np.mean(v_val)))
                 prt.print_out('    actor loss: {} -- critic loss: {}'\
                       .format(curr_actor_loss,curr_critic_loss))
-                train_time_beg = time.time()
                 break
 
             if step%args['save_interval'] == 0:
@@ -94,16 +94,29 @@ def main(args, prt):
             prev_actor_loss = curr_actor_loss
             prev_critic_loss = curr_critic_loss
 
+        # Save the model at the end of the training
+        agent.saver.save(sess,args['model_dir']+'/model.ckpt', global_step="final")
+
     else: # inference
         prt.print_out('Evaluation started ...')
         agent.inference(args['infer_type'])
 
+        # google_or evals
+        google_eval = eval_google_or.EvalGoogleOR(args,env)
+        google_eval.perform_routing()
 
-    prt.print_out('Total time is {}'.format(\
-        time.strftime("%H:%M:%S", time.gmtime(time.time()-start_time))))
+        benchmark_object = benchmark.Benchmark(args,env,prt)
+        benchmark_object.perform_benchmark(list_eval=['beam_search','greedy','or_tools'])
+
+
+    prt.print_out('Total time is {}'.format(time.strftime("%H:%M:%S", time.gmtime(time.time()-start_time))))
 
 if __name__ == "__main__":
     args, prt = ParseParams()
+    args['is_train'] = False
+    args['test_size'] = 100
+    args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrp10-2019-11-02_11-55-35/model/"
+
     # Random
     random_seed = args['random_seed']
     if random_seed is not None and random_seed > 0:

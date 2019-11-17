@@ -62,7 +62,7 @@ def ParseParams():
     # parser.add_argument('--loss_type', type=int, default=1, help='1,2,3')
 
     # inference
-    parser.add_argument('--infer_type', default='batch',
+    parser.add_argument('--infer_type', default='single',
         help='single|batch: do inference for the problems one-by-one, or run it all at once')
     parser.add_argument('--beam_width', default=10, type=int, help='')
 
