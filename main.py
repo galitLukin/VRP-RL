@@ -7,7 +7,7 @@ import time
 
 from configs import ParseParams
 
-from evaluation.eval_VRP import eval_google_or
+from evaluation.eval_VRP import eval_google_or,eval_Clarke_Wright
 from evaluation.benchmark import benchmark
 from model.attention_agent import RLAgent
 
@@ -105,16 +105,21 @@ def main(args, prt):
         google_eval = eval_google_or.EvalGoogleOR(args,env)
         google_eval.perform_routing()
 
+        # Clarke_Wright_savings eval
+        CW_eval = eval_Clarke_Wright.EvalClarkeWright(args,env)
+        CW_eval.perform_routing()
+
         benchmark_object = benchmark.Benchmark(args,env,prt)
-        benchmark_object.perform_benchmark(list_eval=['beam_search','greedy','or_tools'])
+        benchmark_object.perform_benchmark(list_eval=['beam_search','greedy','or_tools','Clarke_Wright'])
 
 
     prt.print_out('Total time is {}'.format(time.strftime("%H:%M:%S", time.gmtime(time.time()-start_time))))
 
+
 if __name__ == "__main__":
     args, prt = ParseParams()
     args['is_train'] = False
-    args['test_size'] = 100
+    args['test_size'] = 1000
     args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrp10-2019-11-02_11-55-35/model/"
 
     # Random

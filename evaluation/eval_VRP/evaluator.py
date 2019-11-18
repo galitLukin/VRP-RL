@@ -44,6 +44,21 @@ class RoutingEvaluator(object):
         return list_manager
 
 
+    def perform_routing(self):
+        """
+        Main function of the class, perform the routing on all the tests sets
+        Write result in a new file
+        """
+        list_manager = self._load_manager_stops()
+        list_results = []
+        for manager in list_manager:
+            route= self._route_creator(manager)
+            list_results.append(route)
+
+        # output all the routes
+        self._dump_results(list_results)
+
+
     def _dump_results(self,list_routes):
         """
         Write the results in the output file
@@ -58,6 +73,14 @@ class RoutingEvaluator(object):
 
         data_file.close()
 
+
+    def _route_creator(self,manager):
+        """
+        Route the manager, need to be overwritten
+        :param manager: a stop manager
+        :return:a route object
+        """
+        raise Exception("Need to be overwritten in children classes")
 
 
 
