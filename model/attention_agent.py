@@ -100,7 +100,6 @@ class RLAgent(object):
         idx = (env.n_nodes-1)*tf.ones([batch_size*beam_width,1])
         action = tf.tile(input_pnt[:,env.n_nodes-1],[beam_width,1])
 
-
         # decoder_state
         initial_state = tf.zeros([args['rnn_layers'], 2, batch_size*beam_width, args['hidden_dim']])
         l = tf.unstack(initial_state, axis=0)
@@ -211,7 +210,7 @@ class RLAgent(object):
         else:
             actions = actions_tmp
 
-        R = self.reward_func(actions,env.input_data[:,-1,:2])
+        R = self.reward_func(actions,input_pnt[0,env.n_nodes-1])
 
         ### critic
         v = tf.constant(0)
@@ -331,7 +330,7 @@ class RLAgent(object):
 
 
             # sample decode
-            if step % int(self.args['log_interval']) == 0:
+            if step % int(self.args['log_interval']) == 0 or step == self.dataGen.n_problems -1:
                 example_output = []
                 example_input = []
                 for i in range(self.env.n_nodes):

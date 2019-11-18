@@ -286,6 +286,6 @@ def reward_func(sample_solution,depot):
 
     route_lens_decoded = tf.reduce_sum(tf.pow(tf.reduce_sum(tf.pow(\
         (sample_solution_tilted - sample_solution) ,2), 2) , .5), 0)
-    reward = tf.add(tf.scalar_mul(-0.7,depot_visits),tf.scalar_mul(0.3,route_lens_decoded))
+    reward = tf.add(tf.scalar_mul(0.07,depot_visits),tf.scalar_mul(0.3,route_lens_decoded))
 
-    return route_lens_decoded
+    return reward

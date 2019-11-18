@@ -22,11 +22,10 @@ def lighten_color(color, amount=0.5):
     return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 #the last location is the depot - this is a list of lists outputted from inference
-input = []
-#manually add depot as fitrst location - this is a list of lists outputted from beam search inference
+input =  [[0.39188915, 0.6204959], [0.74632937, 0.76435804], [0.9796736, 0.39036557], [0.5621101, 0.9073347], [0.543051, 0.103109054], [0.94108874, 0.19921248], [0.27434537, 0.7890164], [0.96881443, 0.85726005], [0.599985, 0.5510349], [0.6892647, 0.5528635], [0.083855, 0.97440565]]
 output = []
 #capacity of customers - the order is in the order that they were visited (same order as output excluding the depot)
-capacity = []
+capacity = [7,9,5,1,9,5,3,9,8,5]
 
 xs,ys = [],[]
 for x,y in input:
