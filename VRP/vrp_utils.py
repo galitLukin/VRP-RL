@@ -144,7 +144,7 @@ class Env(object):
         self.n_cust = args['n_cust']
         self.input_dim = args['input_dim']
         self.input_data = tf.placeholder(tf.float32,\
-            shape=[None,self.n_nodes,self.input_dim])
+            shape=[None,self.n_nodes,self.input_dim])       # The dimension of the first (None) can be of any size
 
         self.input_pnt = self.input_data[:,:,:2]
         self.demand = self.input_data[:,:,-1]
@@ -161,8 +161,8 @@ class Env(object):
         self.beam_width = beam_width
         self.batch_beam = self.batch_size * beam_width
 
-        self.input_pnt = self.input_data[:,:,:2]
-        self.demand = self.input_data[:,:,-1]
+        self.input_pnt = self.input_data[:,:,:2]        # corresponds to all x,y
+        self.demand = self.input_data[:,:,-1]           # corresponds to all the demand, sixe[batch,nb_nodes]
 
         # modify the self.input_pnt and self.demand for beam search decoder
 #         self.input_pnt = tf.tile(self.input_pnt, [self.beam_width,1,1])

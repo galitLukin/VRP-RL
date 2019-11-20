@@ -17,3 +17,7 @@
 *.synctex.gz(busy)
 
 *.idea/
+
+*.DS_Store
+*.csv
+
