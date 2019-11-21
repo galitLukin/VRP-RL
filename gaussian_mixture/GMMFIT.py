@@ -1,5 +1,7 @@
 
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 from sklearn import mixture
 import joblib
@@ -22,3 +24,18 @@ clf = joblib.load('test.joblib')
 #Sample generation. Labels are not useful for us, they refer to the gaussian component used to generate sample
 sample_X, _ = clf.sample(n_samples=1000)
 print(sample_X)
+
+maxK = 50
+bicscore = np.zeros(maxK)
+for i in range(0,maxK):
+    print(i)
+    clfi = mixture.GaussianMixture(n_components=i+1, covariance_type='full')
+    clfi.fit(X)
+    bicscore[i] = clfi.bic(X)
+print(bicscore)
+bicgradient = np.zeros(maxK-1)
+#plt.plot(range(maxK),bicscore)
+for i in range(maxK -1):
+    bicgradient[i] = bicscore[i+1] - bicscore[i]
+plt.plot(range(maxK-1),bicgradient)
+plt.show()
