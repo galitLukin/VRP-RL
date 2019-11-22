@@ -65,14 +65,14 @@ def ParseParams():
     # inference
     parser.add_argument('--infer_type', default='batch',
         help='single|batch: do inference for the problems one-by-one, or run it all at once')
-    parser.add_argument('--beam_width', default=2, type=int, help='')
+    parser.add_argument('--beam_width', default=5, type=int, help='')
 
     # Misc
     parser.add_argument('--stdout_print', default=True, type=str2bool, help='print control')
     parser.add_argument("--gpu", default='3', type=str,help="gpu number.")
     parser.add_argument('--log_interval', default=200,type=int, help='Log info every log_step steps')
     parser.add_argument('--test_interval', default=200,type=int, help='test every test_interval steps')
-    parser.add_argument('--save_interval', default=10000,type=int, help='save every save_interval steps')
+    parser.add_argument('--save_interval', default=1000,type=int, help='save every save_interval steps')
     parser.add_argument('--log_dir', type=str, default='logs')
     parser.add_argument('--data_dir', type=str, default='data')
     parser.add_argument('--model_dir', type=str, default='')

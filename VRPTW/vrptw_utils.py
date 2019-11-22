@@ -53,8 +53,8 @@ def create_VRPTW_dataset(
         e_tw = 8
         dur_min = 0.5
         dur_max = 1
-        # Therefore, the begin time window is between 0 and 7, and its duration is from 0.5 to 1
-        tw_begin = rnd.uniform(b_tw,e_tw - dur_min *2, size=(n_problems,n_nodes,1))
+        # Therefore, the begin time window is between 1 and 7, and its duration is from 0.5 to 1 ( from 1 since need to make sure that feasible, and 1.5 > sqrt(2))
+        tw_begin = rnd.uniform(b_tw + dur_max,e_tw - dur_min *2, size=(n_problems,n_nodes,1))
         tw_end = tw_begin + rnd.uniform(dur_min, dur_max,size=(n_problems,n_nodes,1))
 
         d[:,-1]=0 # demand of depo is set to zero
@@ -109,8 +109,8 @@ class DataGenerator(object):
         e_tw = 8
         dur_min = 0.5
         dur_max = 1
-        # Therefore, the begin time window is between 0 and 7, and its duration is from 0.5 to 1
-        tw_begin = self.rnd.uniform(b_tw,e_tw - dur_min *2, size=(self.args['batch_size'],self.args['n_nodes'],1))
+        # Therefore, the begin time window is between 1 and 7, and its duration is from 0.5 to 1 ( from 1 since need to make sure that feasible, and 1.5 > sqrt(2))
+        tw_begin = self.rnd.uniform(b_tw + dur_max,e_tw - dur_min *2, size=(self.args['batch_size'],self.args['n_nodes'],1))
         tw_end = tw_begin + self.rnd.uniform(dur_min, dur_max,size=(self.args['batch_size'],self.args['n_nodes'],1))
 
         d[:,-1]=0 # demand of depo is set to zero

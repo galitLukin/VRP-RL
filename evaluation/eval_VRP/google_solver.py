@@ -11,6 +11,8 @@ class GoogleSolver(object):
         self.env= env
         self.dict_idx_guid = self._create_dict_idx_guid()
 
+        self.multiplier = 10000       # Since google or tool takes only integer
+
 
     def _create_dict_idx_guid(self):
         """
@@ -41,7 +43,7 @@ class GoogleSolver(object):
                     stop_tried = self.manager_stop.depot
                 else:
                     stop_tried = self.manager_stop[self.dict_idx_guid[j]]
-                dist_matrix[i][j] = 1000000 * stop_chosen.get_dist_another_stop(stop_tried)        # we multiplied by 1000 because
+                dist_matrix[i][j] = self.multiplier * stop_chosen.get_dist_another_stop(stop_tried)        # we multiplied by 1000 because
                                                                                                 # google or takes integer as input
 
         data['distance_matrix'] = dist_matrix

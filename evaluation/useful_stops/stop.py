@@ -11,7 +11,7 @@ class Stop(object):
         self.y = float(y)
         self.demand = int(float(demand))
 
-        assert abs(self.demand - float(demand)) <= 0.0001
+        assert abs(self.demand - float(demand)) <= 0.0001, demand
 
 
     @property

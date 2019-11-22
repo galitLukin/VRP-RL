@@ -1,7 +1,7 @@
 
 import os
 
-from evaluation.useful_stops import route,stop
+from evaluation.useful_stops import route,stop,stop_tw
 
 class Benchmark(object):
     """
@@ -66,28 +66,66 @@ class Benchmark(object):
         """
         list_routes = []
         # build task name and datafiles
-        task_name = 'vrp-size-{}-len-{}-results-{}.txt'.format(self.args['test_size'], self.env.n_nodes,ev)
+        task = self.args['task_name']
+
+        task_name = '{}-size-{}-len-{}-results-{}.txt'.format(task,self.args['test_size'], self.env.n_nodes,ev)
         fname = os.path.join(self.args['log_dir'],'results', task_name)
 
         input_file =open(fname, 'r')
 
         line = input_file.readline()
         while line:
-            words = line.strip().split(" ")
-            nb_stops = int(len(words)/2)
-
-            seq = []
-            for i in range(0,nb_stops):
-                new_guid = "i"
-                seq.append(stop.Stop(guid=new_guid,
-                                    x= words[2*i],
-                                    y= words[2*i+1],
-                                    demand=-1))
-
-            list_routes.append(route.Route(seq))
+            if task == 'vrp':
+                route_created = self._read_line(line)
+            else:
+                assert task == 'vrptw'
+                route_created = self._read_line_tw(line)
+                assert route_created.check_feasible_tw()
+            list_routes.append(route_created)
             line = input_file.readline()
 
         input_file.close()
 
         return list_routes
 
+
+    def _read_line(self,line):
+        """
+        :param line:
+        :return: a route in the case where no tw
+        """
+        assert self.args['task_name'] == 'vrp', self.args['task_name']
+        words = line.strip().split(" ")
+        nb_stops = int(len(words)/2)
+
+        seq = []
+        for i in range(0,nb_stops):
+            new_guid = "i"
+            seq.append(stop.Stop(guid=new_guid,
+                                x= words[2*i],
+                                y= words[2*i+1],
+                                demand=-1))
+
+        return route.Route(seq)
+
+
+    def _read_line_tw(self,line):
+        """
+        :param line:
+        :return: a route in the case where tw
+        """
+        assert self.args['task_name'] == 'vrptw', self.args['task_name']
+        words = line.strip().split(" ")
+        nb_stops = int(len(words)/4)
+
+        seq = []
+        for i in range(0,nb_stops):
+            new_guid = "i"
+            seq.append(stop_tw.StopTW(guid=new_guid,
+                                        x= words[4*i],
+                                        y= words[4*i+1],
+                                      begin_tw= words[4*i +2],
+                                      end_tw= words[4*i + 3],
+                                    demand=-1))
+
+        return route.Route(seq)

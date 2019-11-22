@@ -377,30 +377,42 @@ class RLAgent(object):
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
 
+        task = self.args['task_name']
         # build task name and datafiles
-        task_name = 'vrp-size-{}-len-{}-results-{}.txt'.format(self.args['test_size'], self.env.n_nodes,eval_type)
+        task_name = '{}-size-{}-len-{}-results-{}.txt'.format(task,self.args['test_size'], self.env.n_nodes,eval_type)
         fname = os.path.join(self.args['log_dir'],'results', task_name)
 
         input_file =open(fname, 'w')
         for output in all_ouput:
             depot_x = output[0][0]
             depot_y = output[0][1]
+
             nb_stop = 0
             for node in output:
-                input_file.write(str(node[0]) + " " + str(node[1]) + " ")
+                if task == 'vrp':
+                    input_file.write(str(node[0]) + " " + str(node[1]) + " ")
+                elif task =='vrptw':
+                    input_file.write(str(node[0]) + " " + str(node[1]) + " " + str(node[2]) + " " + str(node[3]) + " ")
+                else:
+                    assert False
                 # check if depot or stop
                 if abs(depot_x - node[0]) >= 0.001 or abs(depot_y - node[1]) >= 0.001:
                     nb_stop +=1
 
                 if nb_stop == self.env.n_nodes -1:
                     # we have found all the stops so write depot again and break
-                    input_file.write(str(depot_x) + " " + str(depot_y))
+                    if task == 'vrp':
+                        input_file.write(str(depot_x) + " " + str(depot_y))
+                    elif task =='vrptw':
+                        depot_b_tw = output[0][2]
+                        depot_e_tw = output[0][3]
+                        input_file.write(str(depot_x) + " " + str(depot_y) + " " + str(depot_b_tw) + " " + str(depot_e_tw))
                     break
             input_file.write("\n")
         input_file.close()
 
         # copy the input file
-        copy_name = 'vrp-size-{}-len-{}-test.txt'.format(self.args['test_size'], self.env.n_nodes)
+        copy_name = '{}-size-{}-len-{}-test.txt'.format(task,self.args['test_size'], self.env.n_nodes)
         old_loc = os.path.join(self.args['data_dir'], copy_name)
         new_loc = os.path.join(self.args['log_dir'],'results', copy_name)
         copyfile(old_loc,new_loc)

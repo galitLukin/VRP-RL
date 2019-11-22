@@ -38,6 +38,31 @@ class Route(object):
 
         return tot_dist
 
+    @property
+    def time(self):
+        """
+        Note, only makes sense to be called if we are dealing with tw
+        :return: the total time needed for the route
+        """
+        tot_time = 0
+        current_time = 0
+
+        depot = self.sequence_stops[0]
+
+        for i in range(0,self.nb_stops-1):
+            prev_stop = self.sequence_stops[i]
+            current_stop = self.sequence_stops[i+1]
+
+            time_traveled = np.sqrt((prev_stop.x - current_stop.x)**2 + (prev_stop.y - current_stop.y)**2)
+            current_time = max(current_time + time_traveled, current_stop.begin_tw)
+
+            # check if is depot or not
+            if abs(depot.x - current_stop.x) <= 0.0001 and abs(depot.y - current_stop.y) <= 0.0001:
+                tot_time += current_time
+                current_time = 0
+
+        return tot_time
+
     
     @property
     def demand(self):
@@ -82,5 +107,43 @@ class Route(object):
         self.sequence_stops = new_sequence
 
         assert inital_nb_stop == self.nb_stops
+
+    def insert_stop(self,insertion_pos, stop):
+        """
+        Insert a stop just after the insertion pos
+        :param insertion_pos: eg if 0 then will be inserted just after the depot
+        :param stop: the stop considered
+        :return:
+        """
+        new_sequence = self.sequence_stops[:insertion_pos+1] + [stop] + self.sequence_stops[insertion_pos+1:]
+        self.sequence_stops = new_sequence
+
+
+    def check_feasible_tw(self):
+        """
+        Check that the route is feasible with respect to tw
+        :return: a boolean
+        """
+        current_time = 0
+
+        depot = self.sequence_stops[0]
+
+        for i in range(0,self.nb_stops-1):
+            prev_stop = self.sequence_stops[i]
+            current_stop = self.sequence_stops[i+1]
+
+            time_traveled = np.sqrt((prev_stop.x - current_stop.x)**2 + (prev_stop.y - current_stop.y)**2)
+            current_time = max(current_time + time_traveled, current_stop.begin_tw)
+
+            if current_time > current_stop.end_tw:
+                print("This stop is not valid ", current_time, current_stop.end_tw)
+                return False
+
+            # check if is depot or not
+            if abs(depot.x - current_stop.x) <= 0.0001 and abs(depot.y - current_stop.y) <= 0.0001:
+                current_time = 0
+
+        return True
+
 
 
