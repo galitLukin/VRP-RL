@@ -7,6 +7,15 @@ TaskVRP = namedtuple('TaskVRP', ['task_name',
 						'n_cust',
 						'decode_len',
 						'capacity',
+
+						'demand_max'])
+
+TaskVRPTW = namedtuple('TaskVRPTW', ['task_name',
+						'input_dim',
+						'n_nodes' ,
+						'n_cust',
+						'decode_len',
+						'capacity',
 						'demand_max'])
 
 
@@ -51,3 +60,15 @@ vrp100 = TaskVRP(task_name = 'vrp',
 			  capacity=50,
 			  demand_max=9)
 task_lst['vrp100'] = vrp100
+
+################################
+
+# VRPTW10
+vrptw10 = TaskVRPTW(task_name = 'vrptw',
+			  input_dim=5,
+			  n_nodes=11,
+			  n_cust = 10,
+			  decode_len=20,
+			  capacity=20,
+			  demand_max=9)
+task_lst['vrptw10'] = vrptw10

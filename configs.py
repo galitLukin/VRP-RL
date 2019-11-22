@@ -29,7 +29,8 @@ def ParseParams():
     parser = argparse.ArgumentParser(description="Neural Combinatorial Optimization with RL")
 
     # Data
-    parser.add_argument('--task', default='vrp10', help="Select the task to solve; i.e. vrp10")
+    #parser.add_argument('--task', default='vrp10', help="Select the task to solve; i.e. vrp10")
+    parser.add_argument('--task', default='vrptw10', help="Select the task to solve; i.e. vrptw10")
     parser.add_argument('--batch_size', default=128,type=int, help='Batch size in training')
     parser.add_argument('--n_train', default=260000,type=int, help='Number of training steps')
     parser.add_argument('--test_size', default=1000,type=int, help='Number of problems in test set')
@@ -62,9 +63,9 @@ def ParseParams():
     # parser.add_argument('--loss_type', type=int, default=1, help='1,2,3')
 
     # inference
-    parser.add_argument('--infer_type', default='single',
+    parser.add_argument('--infer_type', default='batch',
         help='single|batch: do inference for the problems one-by-one, or run it all at once')
-    parser.add_argument('--beam_width', default=10, type=int, help='')
+    parser.add_argument('--beam_width', default=2, type=int, help='')
 
     # Misc
     parser.add_argument('--stdout_print', default=True, type=str2bool, help='print control')

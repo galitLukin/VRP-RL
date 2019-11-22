@@ -22,6 +22,13 @@ def load_task_specific_components(task):
         AttentionActor = AttentionVRPActor
         AttentionCritic = AttentionVRPCritic
 
+    elif task == 'vrptw':
+        from VRPTW.vrptw_utils import DataGenerator,Env,reward_func
+        from VRPTW.vrptw_attention import AttentionVRPTWActor, AttentionVRPTWCritic
+
+        AttentionActor = AttentionVRPTWActor
+        AttentionCritic = AttentionVRPTWCritic
+
     else:
         raise Exception('Task is not implemented')
 
@@ -95,7 +102,7 @@ def main(args, prt):
             prev_critic_loss = curr_critic_loss
 
         # Save the model at the end of the training
-        agent.saver.save(sess,args['model_dir']+'/model.ckpt', global_step="final")
+        agent.saver.save(sess,args['model_dir']+'/model.ckpt', global_step=step)
 
     else: # inference
         prt.print_out('Evaluation started ...')
@@ -118,9 +125,9 @@ def main(args, prt):
 
 if __name__ == "__main__":
     args, prt = ParseParams()
-    args['is_train'] = False
-    args['test_size'] = 1000
-    args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrp10-2019-11-02_11-55-35/model/"
+    # args['is_train'] = False
+    # args['test_size'] = 1000
+    # args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrp10-2019-11-02_11-55-35/model/"
 
     # Random
     random_seed = args['random_seed']
