@@ -108,7 +108,7 @@ class RLAgent(object):
         decoder_state = tuple([tf.nn.rnn_cell.LSTMStateTuple(l[idx][0],l[idx][1])
                   for idx in range(args['rnn_layers'])])
 
-        # start from depot in VRP 
+        # start from depot in VRP
         # decoder_input: [batch_size*beam_width x 1 x hidden_dim]
         decoder_input = tf.tile(tf.expand_dims(encoder_emb_inp[:,env.n_nodes-1], 1),
                                 [beam_width,1,1])
@@ -212,7 +212,11 @@ class RLAgent(object):
         else:
             actions = actions_tmp
 
-        R = self.reward_func(actions)
+        if self.args['min_trucks']:
+            R = self.reward_func(actions,input_pnt[0,env.n_nodes-1])
+        else:
+            R = self.reward_func(actions)
+
 
         ### critic
         v = tf.constant(0)

@@ -22,7 +22,7 @@ def create_VRP_dataset(
         data_type: the purpose for generating the data. It can be 'train', 'val', or any string.
     output:
         data: a numpy array with shape [n_problems x (n_cust+1) x 3]
-        in the last dimension, we have x,y,demand for customers. The last node is for depot and 
+        in the last dimension, we have x,y,demand for customers. The last node is for depot and
         it has demand 0.
      '''
 
@@ -32,7 +32,7 @@ def create_VRP_dataset(
         rnd = np.random
     else:
         rnd = np.random.RandomState(seed)
-    
+
     # build task name and datafiles
     task_name = 'vrp-size-{}-len-{}-{}.txt'.format(n_problems, n_nodes,data_type)
     fname = os.path.join(data_dir, task_name)
@@ -44,7 +44,7 @@ def create_VRP_dataset(
         data = data.reshape(-1, n_nodes,3)
     else:
         print('Creating dataset for {}...'.format(task_name))
-        # Generate a training set of size n_problems 
+        # Generate a training set of size n_problems
         x = rnd.uniform(0,1,size=(n_problems,n_nodes,2))
         d = rnd.randint(1,10,[n_problems,n_nodes,1])
         d[:,-1]=0 # demand of depo[
@@ -54,7 +54,7 @@ def create_VRP_dataset(
     return data
 
 class DataGenerator(object):
-    def __init__(self, 
+    def __init__(self,
                  args):
 
         '''
@@ -98,7 +98,7 @@ class DataGenerator(object):
 
         return input_data
 
- 
+
     def get_test_next(self):
         '''
         Get next batch of problems for testing
@@ -107,7 +107,7 @@ class DataGenerator(object):
             input_pnt = self.test_data[self.count:self.count+1]
             self.count +=1
         else:
-            warnings.warn("The test iterator reset.") 
+            warnings.warn("The test iterator reset.")
             self.count = 0
             input_pnt = self.test_data[self.count:self.count+1]
             self.count +=1
@@ -119,7 +119,7 @@ class DataGenerator(object):
         Get all test problems
         '''
         return self.test_data
-    
+
 
 class State(collections.namedtuple("State",
                                         ("load",
@@ -127,13 +127,13 @@ class State(collections.namedtuple("State",
                                          'd_sat',
                                          "mask"))):
     pass
-    
+
 class Env(object):
     def __init__(self,
                  args):
         '''
         This is the environment for VRP.
-        Inputs: 
+        Inputs:
             args: the parameter dictionary. It should include:
                 args['n_nodes']: number of nodes in VRP
                 args['n_custs']: number of customers in VRP
@@ -148,11 +148,11 @@ class Env(object):
 
         self.input_pnt = self.input_data[:,:,:2]
         self.demand = self.input_data[:,:,-1]
-        self.batch_size = tf.shape(self.input_pnt)[0] 
-        
+        self.batch_size = tf.shape(self.input_pnt)[0]
+
     def reset(self,beam_width=1):
         '''
-        Resets the environment. This environment might be used with different decoders. 
+        Resets the environment. This environment might be used with different decoders.
         In case of using with beam-search decoder, we need to have to increase
         the rows of the mask by a factor of beam_width.
         '''
@@ -233,11 +233,11 @@ class Env(object):
         self.mask = tf.concat([tf.cast(tf.equal(self.demand,0), tf.float32)[:,:-1],
                                           tf.zeros([self.batch_beam,1])],1)
 
-        # mask if load= 0 
+        # mask if load= 0
         # mask if in depot and there is still a demand
 
         self.mask += tf.concat( [tf.tile(tf.expand_dims(tf.cast(tf.equal(self.load,0),
-            tf.float32),1), [1,self.n_cust]),                      
+            tf.float32),1), [1,self.n_cust]),
             tf.expand_dims(tf.multiply(tf.cast(tf.greater(tf.reduce_sum(self.demand,1),0),tf.float32),
                              tf.squeeze( tf.cast(tf.equal(idx,self.n_cust),tf.float32))),1)],1)
 
@@ -248,8 +248,8 @@ class Env(object):
 
         return state
 
-def reward_func(sample_solution):
-    """The reward for the VRP task is defined as the 
+def reward_func(sample_solution, depot=None):
+    """The reward for the VRP task is defined as the
     negative value of the route length
 
     Args:
@@ -272,7 +272,11 @@ def reward_func(sample_solution):
                                                     #  [4,4]] ]
     """
     # make init_solution of shape [sourceL x batch_size x input_dim]
+    if depot != None:
+        depot_visits = tf.cast(tf.equal(sample_solution[0], depot), tf.float32)[:,0]
 
+        for i in range(1,len(sample_solution)):
+            depot_visits = tf.add(depot_visits,tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0])
 
     # make sample_solution of shape [sourceL x batch_size x input_dim]
     sample_solution = tf.stack(sample_solution,0)
@@ -280,10 +284,11 @@ def reward_func(sample_solution):
     sample_solution_tilted = tf.concat((tf.expand_dims(sample_solution[-1],0),
          sample_solution[:-1]),0)
     # get the reward based on the route lengths
-
-
     route_lens_decoded = tf.reduce_sum(tf.pow(tf.reduce_sum(tf.pow(\
         (sample_solution_tilted - sample_solution) ,2), 2) , .5), 0)
 
-    return route_lens_decoded 
-
+    if depot != None:
+        reward = tf.add(tf.scalar_mul(0.07,depot_visits),tf.scalar_mul(0.3,route_lens_decoded))
+        return reward
+    else:
+        return route_lens_decoded
