@@ -25,7 +25,7 @@ clf = joblib.load('test.joblib')
 sample_X, _ = clf.sample(n_samples=1000)
 print(sample_X)
 
-maxK = 50
+maxK = 20
 bicscore = np.zeros(maxK)
 for i in range(0,maxK):
     print(i)
@@ -38,4 +38,13 @@ bicgradient = np.zeros(maxK-1)
 for i in range(maxK -1):
     bicgradient[i] = bicscore[i+1] - bicscore[i]
 plt.plot(range(maxK-1),bicgradient)
+plt.title("Gradient of BIC scores")
+plt.xlabel("Number of components")
+plt.ylabel("Value of gradient")
+plt.show()
+
+plt.plot(range(maxK-1),bicscore[:(maxK-1)])
+plt.title("BIC scores")
+plt.xlabel("Number of components")
+plt.ylabel("Value of BIC")
 plt.show()

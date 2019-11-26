@@ -18,5 +18,8 @@ class StopTW(stop.Stop):
         return self.begin_tw,self.end_tw
 
 
-
+    def to_print(self):
+        txt = "stop_tw, " + str(self.x) + " " + str(self.y) + " "
+        txt += str(self.begin_tw) + "  " + str(self.end_tw) + " " + str(self.demand)
+        return txt
 

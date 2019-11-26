@@ -5,10 +5,10 @@ from evaluation.eval_VRPTW import evaluator,I1heuristics
 class EvalI1Heuristics(evaluator.RoutingEvaluator):
     """Using google or tools, eval the VRP problem"""
 
-    def __init__(self,args,env):
-        super(EvalI1Heuristics,self).__init__(args,env)
-
-        self._update_filename('I1_heuristic')
+    def __init__(self,args,env,prt):
+        super(EvalI1Heuristics,self).__init__(args,env,prt)
+        self.name = 'I1_heuristic'
+        self._update_filename(self.name)
 
 
     def _route_creator(self, manager):

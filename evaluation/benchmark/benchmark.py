@@ -80,7 +80,10 @@ class Benchmark(object):
             else:
                 assert task == 'vrptw'
                 route_created = self._read_line_tw(line)
-                assert route_created.check_feasible_tw()
+                #assert route_created.check_feasible_tw(),ev
+                if not route_created.check_feasible_tw():
+                    print("route infeasible ", ev)
+                    #assert False
             list_routes.append(route_created)
             line = input_file.readline()
 

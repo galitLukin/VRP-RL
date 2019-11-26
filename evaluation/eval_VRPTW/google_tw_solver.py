@@ -48,7 +48,7 @@ class GoogleSolverTW(object):
                                                                                                 # google or takes integer as input
 
         data['distance_matrix'] = dist_matrix
-        list_tw = [(self.multiplier * self.manager_stop_tw.depot.begin_tw, self.multiplier * self.manager_stop_tw.depot.end_tw)]
+        list_tw = [(self.multiplier * self.manager_stop_tw.depot.begin_tw, self.multiplier * (self.manager_stop_tw.depot.end_tw +10))]
         list_tw+= [ ( self.multiplier * self.manager_stop_tw[self.dict_idx_guid[i]].begin_tw, self.multiplier * self.manager_stop_tw[self.dict_idx_guid[i]].end_tw) for i in self.dict_idx_guid if i !=0]
         data['time_windows'] =list_tw
 
@@ -121,6 +121,11 @@ class GoogleSolverTW(object):
             True,  # start cumul to zero
             'Capacity')
 
+        # Allow to drop nodes.
+        penalty = self.multiplier * 1000
+        for node in range(1, len(data['distance_matrix'])):
+            routing.AddDisjunction([manager_model.NodeToIndex(node)], penalty)
+
         for i in range(data['num_vehicles']):
             routing.AddVariableMinimizedByFinalizer(
                 time_dimension.CumulVar(routing.Start(i)))
@@ -137,6 +142,10 @@ class GoogleSolverTW(object):
         # Print solution on console.
         if assignment:
             return self._parse_solution(data, manager_model,routing, assignment)
+
+        else:
+            print("Infeasible in Google OR")
+            assert False
 
 
     def _parse_solution(self,data,manager_model,routing, assignment):

@@ -209,6 +209,7 @@ class RLAgent(object):
                 tmpind += [tf.gather_nd(
                     (batchBeamSeq + tf.cast(batch_size,tf.int64)*beam_path[k]),tmpind[-1])]
             actions = tmplst
+
         else:
             actions = actions_tmp
 
@@ -323,6 +324,7 @@ class RLAgent(object):
             R, v, logprobs, actions,idxs, batch, _= self.sess.run(summary,
                                          feed_dict={self.env.input_data:data,
                                                    self.decodeStep.dropout:0.0})
+
             if eval_type=='greedy':
                 avg_reward.append(R)
                 R_ind0 = 0

@@ -5,6 +5,8 @@ from tqdm import tqdm
 import tensorflow as tf
 import time
 
+import shared.misc_utils as utils
+
 from configs import ParseParams
 
 from evaluation.benchmark import benchmark
@@ -123,16 +125,16 @@ def main(args, prt):
 
     else: # inference
         prt.print_out('Evaluation started ...')
-        agent.inference(args['infer_type'])
+        #agent.inference(args['infer_type'])
 
         all_evaluator = load_task_specific_eval(args['task_name'])
 
         # perform the evaluation
-        list_eval = ['beam_search','greedy']
+        list_eval = ['greedy','beam_search']
         for eval_tuple in all_evaluator:
             list_eval.append(eval_tuple[1])
 
-            object_eval = eval_tuple[0](args,env)
+            object_eval = eval_tuple[0](args,env,prt)
             object_eval.perform_routing()
 
         benchmark_object = benchmark.Benchmark(args,env,prt)
@@ -143,10 +145,30 @@ def main(args, prt):
 
 if __name__ == "__main__":
     args, prt = ParseParams()
-    args['is_train'] = False
-    args['infer_type'] = 'single'
-    args['test_size'] = 20
-    args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrptw10-2019-11-22_09-42-12/model/"
+    # args['is_train'] = False
+    # args['infer_type'] = 'single'
+    # args['test_size'] = 1000
+    # args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrptw50-2019-11-26_13-46-02/model/"
+
+    # args['data_dir'] = "drive/My Drive/VRP-RL/data"
+    # args['log_dir'] = "drive/My Drive/VRP-RL/logs"
+    # args['log_dir'] = "{}/{}-{}".format(args['log_dir'],args['task'], utils.get_time())
+    # print(args['log_dir'])
+    # args['model_dir'] = os.path.join(args['log_dir'],'model')
+    #
+    # args['load_path'] = "drive/My Drive/VRP-RL/logs/vrptw50-2019-11-25_01-28-09/model/"
+    # print(args['model_dir'])
+    # # file to write the stdout
+    # try:
+    #     os.makedirs(args['log_dir'])
+    #     os.makedirs(args['model_dir'])
+    # except:
+    #     pass
+    #
+    # # create a print handler
+    # out_file = open(os.path.join(args['log_dir'], 'results.txt'),'w+')
+    # prt = utils.printOut(out_file,args['stdout_print'])
+
 
     # Random
     random_seed = args['random_seed']

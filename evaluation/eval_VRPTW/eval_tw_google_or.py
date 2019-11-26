@@ -6,10 +6,11 @@ class EvalTWGoogleOR(evaluator.RoutingEvaluator):
     Using google or tools, eval the VRPTW porblem
     """
 
-    def __init__(self,args,env):
-        super(EvalTWGoogleOR,self).__init__(args,env)
+    def __init__(self,args,env,prt):
+        super(EvalTWGoogleOR,self).__init__(args,env,prt)
+        self.name = 'or_tools_tw'
 
-        self._update_filename('or_tools_tw')
+        self._update_filename(self.name)
 
 
     def _route_creator(self, manager):
