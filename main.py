@@ -79,6 +79,10 @@ def main(args, prt):
     prev_actor_loss, prev_critic_loss = float('Inf'), float('Inf')
     actor_eps, critic_eps = 1e-2, 1e-2
     start_time = time.time()
+    convergence_counter = 0
+    al_file = open(args['log_dir']+"/actorLoss.txt", "w")
+    cl_file = open(args['log_dir']+"/criticLoss.txt", "w")
+    r_file = open(args['log_dir']+"/reward.txt", "w")
     if args['is_train']:
         prt.print_out('Training started ...')
         train_time_beg = time.time()
@@ -89,8 +93,15 @@ def main(args, prt):
 
             curr_actor_loss = np.mean(actor_loss_val)
             curr_critic_loss = np.mean(critic_loss_val)
+            print(actor_loss_val,file = al_file)
+            print(critic_loss_val,file = cl_file)
+            print(np.mean(R_val),file = r_file)
             if abs(prev_actor_loss - curr_actor_loss) < actor_eps \
                 and abs(prev_critic_loss - curr_critic_loss) < critic_eps:
+                convergence_counter += 1
+            else:
+                convergence_counter = 0
+            if convergence_counter == 10:
                 prt.print_out('Converged at step {}'\
                       .format(step))
                 train_time_end = time.time()-train_time_beg
@@ -139,14 +150,17 @@ def main(args, prt):
         benchmark_object.perform_benchmark(list_eval=list_eval)
 
     prt.print_out('Total time is {}'.format(time.strftime("%H:%M:%S", time.gmtime(time.time()-start_time))))
-
+    al_file.close()
+    cl_file.close()
+    r_file.close()
 
 if __name__ == "__main__":
     args, prt = ParseParams()
-    args['is_train'] = False
-    args['infer_type'] = 'single'
-    args['test_size'] = 20
-    args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrptw10-2019-11-22_09-42-12/model/"
+    # Julie's params
+    # args['is_train'] = False
+    # args['infer_type'] = 'single'
+    # args['test_size'] = 20
+    # args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrptw10-2019-11-22_09-42-12/model/"
 
     # Random
     random_seed = args['random_seed']
