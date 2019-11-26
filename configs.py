@@ -30,7 +30,7 @@ def ParseParams():
 
     # Data
     #parser.add_argument('--task', default='vrp10', help="Select the task to solve; i.e. vrp10")
-    parser.add_argument('--task', default='vrptw10', help="Select the task to solve; i.e. vrptw10")
+    parser.add_argument('--task', default='vrptw50', help="Select the task to solve; i.e. vrptw10")
     parser.add_argument('--batch_size', default=128,type=int, help='Batch size in training')
     parser.add_argument('--n_train', default=260000,type=int, help='Number of training steps')
     parser.add_argument('--test_size', default=1000,type=int, help='Number of problems in test set')
@@ -75,7 +75,7 @@ def ParseParams():
     parser.add_argument('--test_interval', default=200,type=int, help='test every test_interval steps')
     parser.add_argument('--save_interval', default=1000,type=int, help='save every save_interval steps')
     parser.add_argument('--log_dir', type=str, default='logs')
-    parser.add_argument('--data_dir', type=str, default='data')
+    parser.add_argument('--data_dir', type=str, default='./data')
     parser.add_argument('--model_dir', type=str, default='')
     parser.add_argument('--load_path', type=str, default='', help='Path to load trained variables')
     parser.add_argument('--disable_tqdm', default=True, type=str2bool)

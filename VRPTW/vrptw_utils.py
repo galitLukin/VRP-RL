@@ -59,7 +59,7 @@ def create_VRPTW_dataset(
 
         d[:,-1]=0 # demand of depo is set to zero
         tw_begin[:,-1] = b_tw      # time window of the depo begin at 0
-        tw_end[:,-1] = 10000       # and ends at infinity (for the moment)
+        tw_end[:,-1] = e_tw     # and ends at infinity (for the moment)
 
         data = np.concatenate([x,tw_begin,tw_end,d],axis =2)
         np.savetxt(fname, data.reshape(-1, n_nodes*5))
@@ -86,7 +86,7 @@ class DataGenerator(object):
 
         # create test data
         self.n_problems = args['test_size']
-        self.test_data = create_VRPTW_dataset(self.n_problems,args['n_cust'],'./data',
+        self.test_data = create_VRPTW_dataset(self.n_problems,args['n_cust'],args['data_dir'],
             seed = args['random_seed']+1,data_type='test')
 
         self.reset()
@@ -102,7 +102,7 @@ class DataGenerator(object):
         '''
 
         x = self.rnd.uniform(0,1,size=(self.args['batch_size'],self.args['n_nodes'],2))
-        d = self.rnd.randint(1,10,[self.args['batch_size'],self.args['n_nodes']])
+        d = self.rnd.randint(1,10,[self.args['batch_size'],self.args['n_nodes'],1])
 
         # we set the day as being from 0 to 8.
         b_tw = 0
@@ -115,9 +115,9 @@ class DataGenerator(object):
 
         d[:,-1]=0 # demand of depo is set to zero
         tw_begin[:,-1] = b_tw      # time window of the depo begin at 0
-        tw_end[:,-1] = e_tw        # and ends at 8
+        tw_end[:,-1] = 10000        # and ends at infinity (for the moment)
 
-        input_data = np.concatenate([x,tw_begin,tw_end,np.expand_dims(d,2)],axis =2)
+        input_data = np.concatenate([x,tw_begin,tw_end,d],axis =2)
 
         return input_data
 
@@ -231,7 +231,6 @@ class Env(object):
                 dtype=tf.float32)
 
         # update mask -- mask if customer demand is 0 and depot
-        # Todo: do we need to update function of the time as well ? Do not think so but will see...
         self.mask = tf.concat([tf.cast(tf.equal(self.demand,0), tf.float32)[:,:-1],
             tf.ones([self.batch_beam,1])],1)
 
@@ -270,9 +269,9 @@ class Env(object):
             self.mask = tf.gather_nd(self.mask,batchedBeamIdx)
 
             # Previous location [batch_size*beam_width x sourceL]
-            # self.previous_x = tf.gather_nd(self.previous_x,batchedBeamIdx)
-            # self.previous_y = tf.gather_nd(self.previous_y,batchedBeamIdx)
-            #
+            self.previous_x = tf.gather_nd(self.previous_x,batchedBeamIdx)
+            self.previous_y = tf.gather_nd(self.previous_y,batchedBeamIdx)
+
             self.all_x = tf.gather_nd(self.all_x,batchedBeamIdx)
             self.all_y = tf.gather_nd(self.all_y,batchedBeamIdx)
             self.all_b_tw = tf.gather_nd(self.all_b_tw, batchedBeamIdx)
@@ -293,7 +292,6 @@ class Env(object):
         self.load -= d_sat
 
         # how much time has been spent
-        # Todo may need to do some tiling etc (cf demand) for this as well
         visited_x = tf.gather_nd(self.all_x,batched_idx)
         visited_x = tf.expand_dims(visited_x,1)
         visited_y = tf.gather_nd(self.all_y,batched_idx)
@@ -317,7 +315,7 @@ class Env(object):
 
         self.time = tf.multiply(self.time, 1- depot_flag)
 
-        # mask for customers with zero demand
+        # mask for customers with zero demand (except depot, cf :-1)
         self.mask = tf.concat([tf.cast(tf.equal(self.demand,0), tf.float32)[:,:-1],
                                           tf.zeros([self.batch_beam,1])],1)
 
@@ -329,7 +327,6 @@ class Env(object):
             tf.expand_dims(tf.multiply(tf.cast(tf.greater(tf.reduce_sum(self.demand,1),0),tf.float32),
                              tf.squeeze( tf.cast(tf.equal(idx,self.n_cust),tf.float32))),1)],1)
 
-        # Todo mask if time to go there is greater than the time windows.
         # put the previous_x y as a matrix [batchsize * n_nodes]
         matrix_x = tf.tile(self.previous_x,[1,self.n_nodes])
         matrix_y = tf.tile(self.previous_y,[1,self.n_nodes])

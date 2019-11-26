@@ -1,7 +1,7 @@
 
 
 
-import os
+import os, time
 from evaluation.useful_stops import manager_stop_tw
 
 class RoutingEvaluator(object):
@@ -9,9 +9,11 @@ class RoutingEvaluator(object):
     Mother class of all the benchmarks method
     """
 
-    def __init__(self,args,env):
+    def __init__(self,args,env,prt):
         self.args = args
         self.env = env
+        self.prt = prt
+        self.name = "mother_eval"
 
         self.output_file = None
 
@@ -54,9 +56,13 @@ class RoutingEvaluator(object):
         list_manager = self._load_manager_stops()
 
         list_results = []
+        time_beg = time.time()
         for i, manager in enumerate(list_manager):
             route= self._route_creator(manager)
             list_results.append(route)
+
+        time_end = time.time() - time_beg
+        self.prt.print_out("Finished evalution with " + str(self.name) + " in " + str(time_end))
 
         # output all the routes
         self._dump_results(list_results)
