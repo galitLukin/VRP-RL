@@ -349,13 +349,13 @@ class Env(object):
         return state
 
 
-def reward_func(sample_solution):
+def reward_func(sample_solution, depot = None):
     """The reward for the VRP task is defined as the
     negative value of the route length
 
     Args:
         sample_solution : a list tensor of size decode_len of shape [batch_size x input_dim]
-        demands satisfied: a list tensor of size decode_len of shape [batch_size]
+        depot: if not None, then means that we are aiming at decreasing the number of return to thde depot
 
     Returns:
         rewards: tensor of size [batch_size]
@@ -372,7 +372,10 @@ def reward_func(sample_solution):
                                                     # [[3,3]
                                                     #  [4,4]] ]
     """
-    # make init_solution of shape [sourceL x batch_size x input_dim]
+    if not depot is None:
+        depot_visits = tf.cast(tf.equal(sample_solution[0], depot), tf.float32)[:,0]
+        for i in range(1,len(sample_solution)):
+            depot_visits = tf.add(depot_visits,tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0])
 
 
     # make sample_solution of shape [sourceL x batch_size x input_dim]
@@ -389,5 +392,9 @@ def reward_func(sample_solution):
     route_lens_decoded = tf.reduce_sum(tf.pow(tf.reduce_sum(tf.pow(\
         (sample_solution_tilted - sample_solution) ,2), 2) , .5), 0)
 
-    return route_lens_decoded
+    if not depot is None:
+        reward = tf.add(tf.scalar_mul(0.07,depot_visits),tf.scalar_mul(0.3,route_lens_decoded))
+        return reward
+    else:
+        return route_lens_decoded
 

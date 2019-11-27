@@ -101,7 +101,6 @@ class RLAgent(object):
         idx = (env.n_nodes-1)*tf.ones([batch_size*beam_width,1])
         action = tf.tile(input_pnt[:,env.n_nodes-1],[beam_width,1])
 
-
         # decoder_state
         initial_state = tf.zeros([args['rnn_layers'], 2, batch_size*beam_width, args['hidden_dim']])
         l = tf.unstack(initial_state, axis=0)
@@ -214,7 +213,7 @@ class RLAgent(object):
             actions = actions_tmp
 
         if self.args['min_trucks']:
-            R = self.reward_func(actions,input_pnt[0,env.n_nodes-1])
+            R = self.reward_func(actions,input_pnt[:,env.n_nodes-1,:])
         else:
             R = self.reward_func(actions)
 
