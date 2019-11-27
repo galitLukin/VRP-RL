@@ -9,10 +9,11 @@ class RoutingEvaluator(object):
     Mother class of all the benchmarks method
     """
 
-    def __init__(self,args,env,prt):
+    def __init__(self,args,env,prt,min_veh):
         self.args = args
         self.env = env
         self.prt = prt
+        self.min_veh =min_veh
         self.name = "mother_eval"
 
         self.output_file = None

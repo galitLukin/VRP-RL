@@ -6,9 +6,10 @@ class GoogleSolverTW(object):
     Solver of google tw or
     """
 
-    def __init__(self,manager_stop_tw,env):
+    def __init__(self,manager_stop_tw,env, min_veh):
         self.manager_stop_tw = manager_stop_tw
         self.env = env
+        self.min_veh = min_veh
         self.dict_idx_guid = self._create_dict_idx_guid()
 
         self.multiplier = 10000       # Since google or tool takes only integer
@@ -122,15 +123,18 @@ class GoogleSolverTW(object):
             'Capacity')
 
         # Allow to drop nodes.
-        penalty = self.multiplier * 1000
+        penalty = self.multiplier * 100000
         for node in range(1, len(data['distance_matrix'])):
             routing.AddDisjunction([manager_model.NodeToIndex(node)], penalty)
 
+        penalty_veh = self.multiplier * 200     # would need to put 500 nodes in a vehicle to balance
         for i in range(data['num_vehicles']):
             routing.AddVariableMinimizedByFinalizer(
                 time_dimension.CumulVar(routing.Start(i)))
             routing.AddVariableMinimizedByFinalizer(
                 time_dimension.CumulVar(routing.End(i)))
+            if self.min_veh:
+                routing.SetFixedCostOfVehicle(penalty_veh, i)
 
         # Setting first solution heuristic.
         search_parameters = pywrapcp.DefaultRoutingSearchParameters()

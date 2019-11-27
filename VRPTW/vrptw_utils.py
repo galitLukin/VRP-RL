@@ -67,6 +67,64 @@ def create_VRPTW_dataset(
 
     return data
 
+
+def create_VRPTW_UPS_dataset(
+        n_problems,
+        n_cust,
+        data_dir,
+        generator,
+        data_type='train'):
+    '''
+    This function creates VRPTW instances and saves them on disk. If a file is already available,
+    it will load the file.
+    Input:
+        n_problems: number of problems to generate.
+        n_cust: number of customers in the problem.
+        data_dir: the directory to save or load the file.
+        seed: random seed for generating the data.
+        data_type: the purpose for generating the data. It can be 'train', 'val', or any string.
+    output:
+        data: a numpy array with shape [n_problems x (n_cust+1) x 5]
+        in the last dimension, we have x,y,begin_tw,end_tw,demand for customers. The last node is for depot and
+        it has demand 0.
+     '''
+    # set random number generator
+    n_nodes = n_cust +1     # 1 is for depot
+
+    # build task name and datafiles
+    task_name = 'vrptw-ups-size-{}-len-{}-{}.txt'.format(n_problems, n_nodes,data_type)
+    fname = os.path.join(data_dir, task_name)
+
+    # cteate/load data
+    if os.path.exists(fname):
+        print('Loading dataset for {}...'.format(task_name))
+        data = np.loadtxt(fname,delimiter=' ')
+        data = data.reshape(-1, n_nodes,5)
+    else:
+        print('Creating dataset for {}...'.format(task_name))
+        # Generate a training set of size n_problems
+        data = []
+        depot = [42.3775,-71.0796,0,1900,0]
+
+        intfunct = np.vectorize(lambda x : round(x))
+        check_TW = np.vectorize(lambda x,y : x if x < y else y - 50 )
+
+        for i in range(0,n_problems):
+            sample_X,_ = generator.sample(n_samples = n_cust)
+
+            # need to format data
+            sample_X[:,4] = intfunct(sample_X[:,4])     # make sure that demand is integer
+            sample_X[:,2] = check_TW(sample_X[:,2],sample_X[:,3])
+
+            # concatenate depot
+            final_data = np.append(sample_X,[depot],axis=0)
+            data.append(final_data)
+
+        data = np.array(data)
+        np.savetxt(fname, data.reshape(-1, n_nodes*5))
+
+    return data
+
 class DataGenerator(object):
     def __init__(self,
                  args):
@@ -84,17 +142,22 @@ class DataGenerator(object):
         self.args = args
         self.rnd = np.random.RandomState(seed= args['random_seed'])
         if self.args['ups']:
-            self.gaussian_generator = joblib.load('../gaussian_mixture/test.joblib')
+            self.gaussian_generator = joblib.load('gaussian_mixture/cvrptw.joblib')
         else:
             self.gaussian_generator = None
-        print('Created train iterator.')
+
 
         # create test data
         self.n_problems = args['test_size']
-        self.test_data = create_VRPTW_dataset(self.n_problems,args['n_cust'],args['data_dir'],
+        if self.args['ups']:
+            self.test_data = create_VRPTW_UPS_dataset(self.n_problems,args['n_cust'],args['data_dir'],
+            generator=self.gaussian_generator,data_type='test')
+        else:
+            self.test_data = create_VRPTW_dataset(self.n_problems,args['n_cust'],args['data_dir'],
             seed = args['random_seed']+1,data_type='test')
 
         self.reset()
+        print('Created train iterator.')
 
 
     def reset(self):
@@ -106,7 +169,25 @@ class DataGenerator(object):
         Get next batch of problems for training based on the UPS data
         :return: input_data: data with shape [batch_size x max_time x 5]
         """
+        input_data = []
+        depot = [42.3775,-71.0796,0,1900,0]
 
+        intfunct = np.vectorize(lambda x : int(x))
+        check_TW = np.vectorize(lambda x,y : x if x < y else y - 50 )
+
+        for i in range(0,self.args['batch_size']):
+            sample_X,_ = self.gaussian_generator.sample(n_samples = self.args['n_nodes']-1)
+
+            # need to format data
+            sample_X[:,4] = intfunct(sample_X[:,4])     # make sure that demand is integer
+            sample_X[:,2] = check_TW(sample_X[:,2],sample_X[:,3])
+
+            # concatenate depot
+            final_data = np.append(sample_X,[depot],axis=0)
+
+            input_data.append(final_data)
+
+        return input_data
 
 
     def get_train_next(self):

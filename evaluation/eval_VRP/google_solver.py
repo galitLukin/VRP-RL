@@ -6,9 +6,10 @@ class GoogleSolver(object):
     Solver of google or
     """
 
-    def __init__(self,manager_stop,env):
+    def __init__(self,manager_stop,env,min_veh):
         self.manager_stop = manager_stop
         self.env= env
+        self.min_veh = min_veh
         self.dict_idx_guid = self._create_dict_idx_guid()
 
         self.multiplier = 10000       # Since google or tool takes only integer
@@ -100,6 +101,10 @@ class GoogleSolver(object):
             True,  # start cumul to zero
             'Capacity')
 
+        if self.min_veh:
+            penalty_veh = self.multiplier * 100000
+            for i in range(data['num_vehicles']):
+                routing.SetFixedCostOfVehicle(penalty_veh, i)
         # Setting first solution heuristic.
         search_parameters = pywrapcp.DefaultRoutingSearchParameters()
         search_parameters.first_solution_strategy = routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
