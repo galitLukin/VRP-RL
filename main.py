@@ -158,7 +158,6 @@ def main(args, prt):
 
 if __name__ == "__main__":
     args, prt = ParseParams()
-
     # args['is_train'] = True
     # args['infer_type'] = 'single'
     # args['test_size'] = 1000
