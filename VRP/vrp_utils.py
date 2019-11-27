@@ -292,7 +292,7 @@ def reward_func(sample_solution, decode_len=0.0, n_nodes=0.0, depot=None):
         (sample_solution_tilted - sample_solution) ,2), 2) , .5), 0)
 
     if depot != None:
-        reward = tf.add(tf.scalar_mul(0.7,tf.scalar_mul(1.0/n_nodes,depot_visits)),tf.scalar_mul(0.3,tf.divide(route_lens_decoded,max_lens_decoded)))
+        reward = tf.add(tf.scalar_mul(70.0,tf.scalar_mul(1.0/n_nodes,depot_visits)),tf.scalar_mul(30.0,tf.divide(route_lens_decoded,max_lens_decoded)))
         return reward
     else:
         return route_lens_decoded
