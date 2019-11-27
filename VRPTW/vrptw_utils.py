@@ -218,7 +218,7 @@ class DataGenerator(object):
 
         d[:,-1]=0 # demand of depo is set to zero
         tw_begin[:,-1] = b_tw      # time window of the depo begin at 0
-        tw_end[:,-1] = 10000        # and ends at infinity (for the moment)
+        tw_end[:,-1] = e_tw        # and ends at infinity (for the moment)
 
         input_data = np.concatenate([x,tw_begin,tw_end,d],axis =2)
 
