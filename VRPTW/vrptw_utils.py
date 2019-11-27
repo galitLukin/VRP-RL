@@ -3,6 +3,7 @@ import tensorflow as tf
 import os
 import warnings
 import collections
+import joblib
 
 
 def create_VRPTW_dataset(
@@ -82,6 +83,10 @@ class DataGenerator(object):
         '''
         self.args = args
         self.rnd = np.random.RandomState(seed= args['random_seed'])
+        if self.args['ups']:
+            self.gaussian_generator = joblib.load('../gaussian_mixture/test.joblib')
+        else:
+            self.gaussian_generator = None
         print('Created train iterator.')
 
         # create test data
@@ -91,10 +96,27 @@ class DataGenerator(object):
 
         self.reset()
 
+
     def reset(self):
         self.count = 0
 
+
+    def _get_train_next_ups(self):
+        """
+        Get next batch of problems for training based on the UPS data
+        :return: input_data: data with shape [batch_size x max_time x 5]
+        """
+
+
+
     def get_train_next(self):
+        if self.args['ups']:
+            return self._get_train_next_ups()
+
+        else:
+            return self._get_train_next_random()
+
+    def _get_train_next_random(self):
         '''
         Get next batch of problems for training
         Retuens:
@@ -374,6 +396,7 @@ def reward_func(sample_solution, depot = None):
     """
     if not depot is None:
         depot_visits = tf.cast(tf.equal(sample_solution[0], depot), tf.float32)[:,0]
+        # tf.assert_equal(depot_visits,tf.ones_like(depot_visits))
         for i in range(1,len(sample_solution)):
             depot_visits = tf.add(depot_visits,tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0])
 

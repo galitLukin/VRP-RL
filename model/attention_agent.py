@@ -213,7 +213,8 @@ class RLAgent(object):
             actions = actions_tmp
 
         if self.args['min_trucks']:
-            R = self.reward_func(actions,input_pnt[:,env.n_nodes-1,:])
+            tile_input_pt = tf.tile(input_pnt[:,env.n_nodes-1,:],[beam_width,1])
+            R = self.reward_func(actions,tile_input_pt)
         else:
             R = self.reward_func(actions)
 
