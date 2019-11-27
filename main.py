@@ -134,7 +134,7 @@ def main(args, prt):
         for eval_tuple in all_evaluator:
             list_eval.append(eval_tuple[1])
 
-            object_eval = eval_tuple[0](args,env,prt)
+            object_eval = eval_tuple[0](args,env,prt,args['min_trucks'])
             object_eval.perform_routing()
 
         benchmark_object = benchmark.Benchmark(args,env,prt)

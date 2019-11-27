@@ -5,8 +5,8 @@ from evaluation.eval_VRP import evaluator,Clarke_Wright_Saving_algo
 class EvalClarkeWright(evaluator.RoutingEvaluator):
     """Using google or tools, eval the VRP problem"""
 
-    def __init__(self,args,env):
-        super(EvalClarkeWright,self).__init__(args,env)
+    def __init__(self,args,env,prt,min_veh):
+        super(EvalClarkeWright,self).__init__(args,env,prt,min_veh)
 
         self._update_filename('Clarke_Wright')
 
