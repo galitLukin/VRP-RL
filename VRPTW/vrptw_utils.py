@@ -371,7 +371,7 @@ class Env(object):
         return state
 
 
-def reward_func(sample_solution, depot = None):
+def reward_func(sample_solution, decode_len=0.0, n_nodes=0.0, depot=None):
     """The reward for the VRP task is defined as the
     negative value of the route length
 
@@ -399,7 +399,9 @@ def reward_func(sample_solution, depot = None):
         # tf.assert_equal(depot_visits,tf.ones_like(depot_visits))
         for i in range(1,len(sample_solution)):
             depot_visits = tf.add(depot_visits,tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0])
-
+        max_length = tf.stack([depot for d in range(decode_len)],0)
+        max_lens_decoded = tf.reduce_sum(tf.pow(tf.reduce_sum(tf.pow(\
+            (max_length - sample_solution) ,2), 2) , .5), 0)
 
     # make sample_solution of shape [sourceL x batch_size x input_dim]
     sample_solution = tf.stack(sample_solution,0)
@@ -411,13 +413,11 @@ def reward_func(sample_solution, depot = None):
          sample_solution[:-1]),0)
     # get the reward based on the route lengths
 
-
     route_lens_decoded = tf.reduce_sum(tf.pow(tf.reduce_sum(tf.pow(\
         (sample_solution_tilted - sample_solution) ,2), 2) , .5), 0)
 
     if not depot is None:
-        reward = tf.add(tf.scalar_mul(0.07,depot_visits),tf.scalar_mul(0.3,route_lens_decoded))
+        reward = tf.add(tf.scalar_mul(0.7,tf.scalar_mul(1.0/n_nodes,depot_visits)),tf.scalar_mul(0.3,tf.divide(route_lens_decoded,max_lens_decoded)))
         return reward
     else:
         return route_lens_decoded
-
