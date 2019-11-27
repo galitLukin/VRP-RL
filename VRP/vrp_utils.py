@@ -68,6 +68,7 @@ class DataGenerator(object):
                 args['batch_size']: batchsize for training
         '''
         self.args = args
+        assert not self.args['ups']
         self.rnd = np.random.RandomState(seed= args['random_seed'])
         print('Created train iterator.')
 

@@ -5,8 +5,8 @@ from evaluation.eval_VRP import evaluator,google_solver
 class EvalGoogleOR(evaluator.RoutingEvaluator):
     """Using google or tools, eval the VRP problem"""
 
-    def __init__(self,args,env):
-        super(EvalGoogleOR,self).__init__(args,env)
+    def __init__(self,args,env,prt,min_veh):
+        super(EvalGoogleOR,self).__init__(args,env,prt,min_veh)
 
         self._update_filename('or_tools')
 
@@ -18,7 +18,7 @@ class EvalGoogleOR(evaluator.RoutingEvaluator):
         :return: a sequence of stop
         """
         solver_object = google_solver.GoogleSolver(manager_stop=manager,
-                                                   env=self.env)
+                                                   env=self.env,min_veh=self.min_veh)
         return solver_object.solve()
 
 
