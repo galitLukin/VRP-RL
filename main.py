@@ -161,7 +161,7 @@ if __name__ == "__main__":
     # args['is_train'] = True
     # args['infer_type'] = 'single'
     # args['test_size'] = 1000
-    #args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrptw50-2019-11-26_13-46-02/model/"
+    # args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrptw50-2019-11-26_13-46-02/model/"
 
     # args['data_dir'] = "drive/My Drive/VRP-RL/data"
     # args['log_dir'] = "drive/My Drive/VRP-RL/logs"

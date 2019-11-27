@@ -73,6 +73,16 @@ vrptw10 = TaskVRPTW(task_name = 'vrptw',
 			  demand_max=9)
 task_lst['vrptw10'] = vrptw10
 
+# VRPTW20
+vrptw20 = TaskVRPTW(task_name = 'vrptw',
+			  input_dim=5,
+			  n_nodes=21,
+			  n_cust = 20,
+			  decode_len=40,
+			  capacity=25,
+			  demand_max=9)
+task_lst['vrptw20'] = vrptw20
+
 # VRPTW50
 vrptw50 = TaskVRPTW(task_name = 'vrptw',
 			  input_dim=5,
