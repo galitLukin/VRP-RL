@@ -29,8 +29,9 @@ def ParseParams():
     parser = argparse.ArgumentParser(description="Neural Combinatorial Optimization with RL")
 
     # Data
-    parser.add_argument('--task', default='vrp10', help="Select the task to solve; i.e. vrp10")
-    parser.add_argument('--ups',default=False,help='decide if we are going to train on the distribution infer from ups')
+    #parser.add_argument('--task', default='vrp10', help="Select the task to solve; i.e. vrp10")
+    parser.add_argument('--task', default='vrptw10', help="Select the task to solve; i.e. vrptw50")
+    parser.add_argument('--ups',default=True,help='decide if we are going to train on the distribution infer from ups')
     parser.add_argument('--batch_size', default=128,type=int, help='Batch size in training')
     parser.add_argument('--n_train', default=260000,type=int, help='Number of training steps')
     parser.add_argument('--test_size', default=1000,type=int, help='Number of problems in test set')
@@ -60,7 +61,7 @@ def ParseParams():
     parser.add_argument('--random_seed', default=24601,type=int, help='')
     parser.add_argument('--max_grad_norm', default=2.0, type=float, help='Gradient clipping')
     parser.add_argument('--entropy_coeff', default=0.0, type=float, help='coefficient for entropy regularization')
-    parser.add_argument('--min_trucks', default=True, type=str2bool, help='True to minimize trucks in reward func')
+    parser.add_argument('--min_trucks', default=False, type=str2bool, help='True to minimize trucks in reward func')
     # parser.add_argument('--loss_type', type=int, default=1, help='1,2,3')
 
     # inference

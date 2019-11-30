@@ -7,7 +7,7 @@ from sklearn import mixture
 import joblib
 
 ev = "cvrptw"
-df = pd.read_csv("/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/data_UPS/list_tuesday_" + ev +".csv")
+df = pd.read_csv("/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/data_UPS/list_tuesday_Central_area_" + ev +".csv")
 X = df.to_numpy()
 print(X)
 
@@ -39,13 +39,13 @@ bicgradient = np.zeros(maxK-1)
 for i in range(maxK -1):
     bicgradient[i] = bicscore[i+1] - bicscore[i]
 plt.plot(range(maxK-1),bicgradient)
-plt.title("Gradient of BIC scores for UPS TW data")
+plt.title("Gradient of BIC scores for UPS TW Central area data")
 plt.xlabel("Number of components")
 plt.ylabel("Value of gradient")
 plt.show()
 
 plt.plot(range(maxK-1),bicscore[:(maxK-1)])
-plt.title("BIC scores for UPS TW data")
+plt.title("BIC scores for UPS TW Central area data")
 plt.xlabel("Number of components")
 plt.ylabel("Value of BIC")
 plt.show()

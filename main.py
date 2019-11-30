@@ -12,7 +12,7 @@ from configs import ParseParams
 from evaluation.benchmark import benchmark
 from model.attention_agent import RLAgent
 
-def load_task_specific_components(task):
+def load_task_specific_components(task,ups):
     '''
     This function load task-specific libraries
     '''
@@ -24,8 +24,12 @@ def load_task_specific_components(task):
         AttentionCritic = AttentionVRPCritic
 
     elif task == 'vrptw':
-        from VRPTW.vrptw_utils import DataGenerator,Env,reward_func
-        from VRPTW.vrptw_attention import AttentionVRPTWActor, AttentionVRPTWCritic
+        if ups:
+            from UPS.vrptw_ups_utils import DataGenerator,Env,reward_func
+            from UPS.vrptw_ups_attention import AttentionVRPTWActor, AttentionVRPTWCritic
+        else:
+            from VRPTW.vrptw_utils import DataGenerator,Env,reward_func
+            from VRPTW.vrptw_attention import AttentionVRPTWActor, AttentionVRPTWCritic
 
         AttentionActor = AttentionVRPTWActor
         AttentionCritic = AttentionVRPTWCritic
@@ -61,7 +65,7 @@ def main(args, prt):
 
     # load task specific classes
     DataGenerator, Env, reward_func, AttentionActor, AttentionCritic = \
-        load_task_specific_components(args['task_name'])
+        load_task_specific_components(args['task_name'],args['ups'])
 
     dataGen = DataGenerator(args)
     dataGen.reset()
@@ -158,7 +162,7 @@ def main(args, prt):
 
 if __name__ == "__main__":
     args, prt = ParseParams()
-    # args['is_train'] = True
+    # args['is_train'] = False
     # args['infer_type'] = 'single'
     # args['test_size'] = 1000
     # args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrptw50-2019-11-26_13-46-02/model/"
