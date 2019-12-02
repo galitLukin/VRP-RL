@@ -405,12 +405,17 @@ def reward_func(sample_solution, decode_len=0.0, n_nodes=0.0, depot=None):
         # tf.assert_equal(depot_visits,tf.ones_like(depot_visits))
         for i in range(1,len(sample_solution)):
             depot_visits = tf.add(depot_visits,tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0])
-        max_length = tf.stack([depot for d in range(decode_len)],0)
-        max_lens_decoded = tf.reduce_sum(tf.pow(tf.reduce_sum(tf.pow(\
-            (max_length - sample_solution) ,2), 2) , .5), 0)
+        # max_length = tf.stack([depot for d in range(decode_len)],0)
+        # max_lens_decoded = tf.reduce_sum(tf.pow(tf.reduce_sum(tf.pow(\
+        #     (max_length - sample_solution) ,2), 2) , .5), 0)
 
     # make sample_solution of shape [sourceL x batch_size x input_dim]
     sample_solution = tf.stack(sample_solution,0)
+    if not depot is None:
+        max_length = tf.stack([depot for d in range(decode_len)],0)
+        interm_max_lens = tf.multiply((sample_solution[:,:,1] - max_length[:,:,1]),tf.cos(tf.scalar_mul(0.5, (sample_solution[:,:,0] + max_length[:,:,0]))))
+        distance_decoded = tf.scalar_mul(6371, tf.sqrt(tf.square(interm_max_lens) + tf.square(sample_solution[:,:,0] - max_length[:,:,0])))
+        max_lens_decoded = tf.reduce_sum(distance_decoded,0)
 
     # make sure that we only take x,y (and not b_tw and e_tw)
     sample_solution = sample_solution[:,:,:2]

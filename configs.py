@@ -61,7 +61,7 @@ def ParseParams():
     parser.add_argument('--random_seed', default=24601,type=int, help='')
     parser.add_argument('--max_grad_norm', default=2.0, type=float, help='Gradient clipping')
     parser.add_argument('--entropy_coeff', default=0.0, type=float, help='coefficient for entropy regularization')
-    parser.add_argument('--min_trucks', default=False, type=str2bool, help='True to minimize trucks in reward func')
+    parser.add_argument('--min_trucks', default=True, type=str2bool, help='True to minimize trucks in reward func')
     # parser.add_argument('--loss_type', type=int, default=1, help='1,2,3')
 
     # inference

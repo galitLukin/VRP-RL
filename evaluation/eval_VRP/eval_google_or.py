@@ -7,8 +7,8 @@ class EvalGoogleOR(evaluator.RoutingEvaluator):
 
     def __init__(self,args,env,prt,min_veh):
         super(EvalGoogleOR,self).__init__(args,env,prt,min_veh)
-
-        self._update_filename('or_tools')
+        self.name = 'or_tools'
+        self._update_filename(self.name)
 
 
     def _route_creator(self, manager):
