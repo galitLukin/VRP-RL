@@ -89,7 +89,8 @@ class DataGenerator(object):
         self.args = args
         self.rnd = np.random.RandomState(seed= args['random_seed'])
         assert self.args['ups']
-        self.gaussian_generator = joblib.load('gaussian_mixture/cvrptw.joblib')
+        path_gaussian = os.path.join('gaussian_mixture','cvrptw.joblib')
+        self.gaussian_generator = joblib.load(path_gaussian)
 
         # create test data
         self.n_problems = args['test_size']
