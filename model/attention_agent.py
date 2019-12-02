@@ -328,7 +328,6 @@ class RLAgent(object):
             R, v, logprobs, actions,idxs, batch, _= self.sess.run(summary,
                                          feed_dict={self.env.input_data:data,
                                                    self.decodeStep.dropout:0.0})
-
             if eval_type=='greedy':
                 avg_reward.append(R)
                 R_ind0 = 0
@@ -440,6 +439,8 @@ class RLAgent(object):
         R, v, logprobs, actions,idxs, batch, _= self.sess.run(summary,
                                      feed_dict={self.env.input_data:data,
                                                self.decodeStep.dropout:0.0})
+
+
         R = np.concatenate(np.split(np.expand_dims(R,1) ,beam_width, axis=0),1 )
         R = np.amin(R,1, keepdims = False)
 

@@ -145,7 +145,7 @@ def main(args, prt):
         all_evaluator = load_task_specific_eval(args['task_name'])
 
         # perform the evaluation
-        list_eval = ['greedy','beam_search']
+        list_eval = ['beam_search'] #['greedy','beam_search']
         for eval_tuple in all_evaluator:
             list_eval.append(eval_tuple[1])
 
@@ -153,6 +153,8 @@ def main(args, prt):
             object_eval.perform_routing()
 
         benchmark_object = benchmark.Benchmark(args,env,prt)
+        list_eval.remove('or_tools')
+        print(list_eval)
         benchmark_object.perform_benchmark(list_eval=list_eval)
 
     prt.print_out('Total time is {}'.format(time.strftime("%H:%M:%S", time.gmtime(time.time()-start_time))))
@@ -162,10 +164,10 @@ def main(args, prt):
 
 if __name__ == "__main__":
     args, prt = ParseParams()
-    # args['is_train'] = False
-    # args['infer_type'] = 'single'
-    # args['test_size'] = 1000
-    # args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrp10-TruckNB/model/"
+    args['is_train'] = False
+    args['infer_type'] = 'single'
+    args['test_size'] = 1000
+    args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrp10-TruckNB/model/"
 
     # args['data_dir'] = "drive/My Drive/VRP-RL/data"
     # args['log_dir'] = "drive/My Drive/VRP-RL/logs"

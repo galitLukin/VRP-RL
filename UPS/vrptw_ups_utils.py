@@ -402,7 +402,8 @@ def reward_func(sample_solution, decode_len=0.0, n_nodes=0.0, depot=None):
     """
     if not depot is None:
         depot_visits = tf.cast(tf.equal(sample_solution[0], depot), tf.float32)[:,0]
-        # tf.assert_equal(depot_visits,tf.ones_like(depot_visits))
+        tf.assert_equal(depot_visits,tf.ones_like(depot_visits))
+
         for i in range(1,len(sample_solution)):
             depot_visits = tf.add(depot_visits,tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0])
         # max_length = tf.stack([depot for d in range(decode_len)],0)
@@ -433,3 +434,4 @@ def reward_func(sample_solution, decode_len=0.0, n_nodes=0.0, depot=None):
         return reward
     else:
         return route_lens_decoded
+
