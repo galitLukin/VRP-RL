@@ -400,15 +400,16 @@ def reward_func(sample_solution, decode_len=0.0, n_nodes=0.0, depot=None):
                                                     # [[3,3]
                                                     #  [4,4]] ]
     """
-    if not depot is None:
+    if depot != None:
+        counter = tf.zeros_like(depot)[:,0]
         depot_visits = tf.cast(tf.equal(sample_solution[0], depot), tf.float32)[:,0]
         tf.assert_equal(depot_visits,tf.ones_like(depot_visits))
 
         for i in range(1,len(sample_solution)):
-            depot_visits = tf.add(depot_visits,tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0])
-        # max_length = tf.stack([depot for d in range(decode_len)],0)
-        # max_lens_decoded = tf.reduce_sum(tf.pow(tf.reduce_sum(tf.pow(\
-        #     (max_length - sample_solution) ,2), 2) , .5), 0)
+            interm_depot = tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0]
+            counter = tf.add(tf.multiply(counter,interm_depot), interm_depot)
+            depot_visits = tf.add(depot_visits, tf.multiply(interm_depot, tf.cast(tf.less(counter,1.5), tf.float32)))
+            # depot_visits = tf.add(depot_visits,tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0])
 
     # make sample_solution of shape [sourceL x batch_size x input_dim]
     sample_solution = tf.stack(sample_solution,0)
