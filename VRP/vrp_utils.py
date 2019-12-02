@@ -274,9 +274,13 @@ def reward_func(sample_solution, decode_len=0.0, n_nodes=0.0, depot=None):
     """
     # make init_solution of shape [sourceL x batch_size x input_dim]
     if depot != None:
+        counter = tf.zeros_like(depot)[:,0]
         depot_visits = tf.cast(tf.equal(sample_solution[0], depot), tf.float32)[:,0]
         for i in range(1,len(sample_solution)):
-            depot_visits = tf.add(depot_visits,tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0])
+            interm_depot = tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0]
+            counter = tf.add(tf.multiply(counter,interm_depot), interm_depot)
+            depot_visits = tf.add(depot_visits, tf.multiply(interm_depot, tf.cast(tf.less(counter,1.5), tf.float32)))
+            # depot_visits = tf.add(depot_visits,tf.cast(tf.equal(sample_solution[i], depot), tf.float32)[:,0])
 
         max_length = tf.stack([depot for d in range(decode_len)],0)
         max_lens_decoded = tf.reduce_sum(tf.pow(tf.reduce_sum(tf.pow(\
@@ -293,6 +297,6 @@ def reward_func(sample_solution, decode_len=0.0, n_nodes=0.0, depot=None):
 
     if depot != None:
         reward = tf.add(tf.scalar_mul(70.0,tf.scalar_mul(1.0/n_nodes,depot_visits)),tf.scalar_mul(30.0,tf.divide(route_lens_decoded,max_lens_decoded)))
-        return reward
+        return depot_visits
     else:
         return route_lens_decoded
