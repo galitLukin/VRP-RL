@@ -11,7 +11,7 @@ class AttentionVRPTWActor(object):
             # self.v: is a variable with shape [1 x dim]
             self.v = tf.get_variable('v',[1,dim],
                        initializer=tf.contrib.layers.xavier_initializer())
-            self.v = tf.expand_dims(self.v,2)   # Todo 2 may be weird
+            self.v = tf.expand_dims(self.v,2)
 
         self.emb_d = tf.layers.Conv1D(dim,1,_scope=_scope+_name+'/emb_d' ) #conv1d of kernel size = dim, stride = 1
         self.emb_ld = tf.layers.Conv1D(dim,1,_scope=_scope+_name+'/emb_ld' ) #conv1d_2

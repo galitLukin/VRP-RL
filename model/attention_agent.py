@@ -440,7 +440,6 @@ class RLAgent(object):
                                      feed_dict={self.env.input_data:data,
                                                self.decodeStep.dropout:0.0})
 
-
         R = np.concatenate(np.split(np.expand_dims(R,1) ,beam_width, axis=0),1 )
         R = np.amin(R,1, keepdims = False)
 
