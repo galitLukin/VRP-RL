@@ -9,7 +9,7 @@ import joblib
 ev = "cvrptw"
 df = pd.read_csv("/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/data_UPS/list_tuesday_Central_area_" + ev +".csv")
 print(df.columns)
-df = df.drop(columns=['Latitude', 'Longitude','service_time'])
+df = df.drop(columns=['Latitude', 'Longitude','service_time','Start Commit Time','End Commit Time'])
 print(df.columns)
 X = df.to_numpy()
 print(X)

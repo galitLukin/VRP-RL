@@ -153,8 +153,8 @@ def main(args, prt):
             object_eval.perform_routing()
 
         benchmark_object = benchmark.Benchmark(args,env,prt)
-        list_eval.remove('I1_heuristic')
-        print(list_eval)
+        list_eval.remove('or_tools_tw')
+        #list_eval.remove('I1_heuristic')
         benchmark_object.perform_benchmark(list_eval=list_eval)
 
     prt.print_out('Total time is {}'.format(time.strftime("%H:%M:%S", time.gmtime(time.time()-start_time))))
@@ -164,10 +164,10 @@ def main(args, prt):
 
 if __name__ == "__main__":
     args, prt = ParseParams()
-    # args['is_train'] = False
-    # args['infer_type'] = 'single'
-    # args['test_size'] = 1000
-    # args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrptw50_min_length/model/"
+    args['is_train'] = False
+    args['infer_type'] = 'single'
+    args['test_size'] = 1000
+    args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrptw20-NB-TRUCK/model/"
 
     # args['data_dir'] = "drive/My Drive/VRP-RL/data"
     # args['log_dir'] = "drive/My Drive/VRP-RL/logs"
