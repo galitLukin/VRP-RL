@@ -5,6 +5,8 @@ import warnings
 import collections
 import joblib
 
+
+
 def create_VRPTW_UPS_dataset(
         n_problems,
         n_cust,
@@ -25,6 +27,7 @@ def create_VRPTW_UPS_dataset(
         in the last dimension, we have x,y,begin_tw,end_tw,demand for customers. The last node is for depot and
         it has demand 0.
      '''
+
     # set random number generator
     n_nodes = n_cust +1     # 1 is for depot
 
@@ -32,7 +35,7 @@ def create_VRPTW_UPS_dataset(
     task_name = 'vrptw-ups-size-{}-len-{}-{}.txt'.format(n_problems, n_nodes,data_type)
     fname = os.path.join(data_dir, task_name)
 
-    # cteate/load data
+   # cteate/load data
     if os.path.exists(fname):
         print('Loading dataset for {}...'.format(task_name))
         data = np.loadtxt(fname,delimiter=' ')
@@ -41,27 +44,10 @@ def create_VRPTW_UPS_dataset(
         print('Creating dataset for {}...'.format(task_name))
         # Generate a training set of size n_problems
         data = []
-        depot = [42.3775 * np.pi/180,-71.0796* np.pi/180,0,1000,0]
-
-        intfunct = np.vectorize(lambda x : max(1,np.round(x)))
-        check_TW_begin = np.vectorize(lambda x,y : x if x < y else y - 50 )
-        check_TW_end = np.vectorize(lambda x: min(x,1000-50))  # ensures
-        transform_radian = np.vectorize(lambda x: x * np.pi/180)
-        translate_tw = np.vectorize(lambda x: max(0,x-892))
+        depot = [0,0,0,1000,0]
 
         for i in range(0,n_problems):
             sample_X,_ = generator.sample(n_samples = n_cust)
-
-           # Transform lat,long in radians
-            sample_X[:,0] = transform_radian(sample_X[:,0])
-            sample_X[:,1] = transform_radian(sample_X[:,1])
-
-            # need to format data
-            sample_X[:,4] = intfunct(sample_X[:,4])     # make sure that demand is integer
-            sample_X[:,2] = check_TW_begin(sample_X[:,2],sample_X[:,3])
-            sample_X[:,2] = translate_tw(sample_X[:,2])
-            sample_X[:,3] = translate_tw(sample_X[:,3])
-            sample_X[:,3] = check_TW_end(sample_X[:,3])
 
             # concatenate depot
             final_data = np.append(sample_X,[depot],axis=0)
@@ -69,8 +55,8 @@ def create_VRPTW_UPS_dataset(
 
         data = np.array(data)
         np.savetxt(fname, data.reshape(-1, n_nodes*5))
-
     return data
+
 
 class DataGenerator(object):
     def __init__(self,
@@ -92,10 +78,11 @@ class DataGenerator(object):
         path_gaussian = os.path.join('gaussian_mixture','cvrptw.joblib')
         self.gaussian_generator = joblib.load(path_gaussian)
 
+
         # create test data
         self.n_problems = args['test_size']
         self.test_data = create_VRPTW_UPS_dataset(self.n_problems,args['n_cust'],args['data_dir'],
-                generator=self.gaussian_generator,data_type='test')
+            generator=self.gaussian_generator,data_type='test')
 
         self.reset()
         print('Created train iterator.')
@@ -106,40 +93,23 @@ class DataGenerator(object):
 
 
     def get_train_next(self):
-        """
-        Get next batch of problems for training based on the UPS data
-        :return: input_data: data with shape [batch_size x max_time x 5]
-        """
+        '''
+        Get next batch of problems for training
+        Retuens:
+            input_data: data with shape [batch_size x max_time x 5]
+        '''
         input_data = []
-        depot = [42.3775* np.pi/180,-71.0796* np.pi/180,0,1000,0]     # shift of 10 hours
-
-        intfunct = np.vectorize(lambda x : max(1,np.round(x)))
-        check_TW_begin = np.vectorize(lambda x,y : x if x < y else y - 50 )
-        check_TW_end = np.vectorize(lambda x: min(x,1000-50))  # ensures
-        transform_radian = np.vectorize(lambda x: x * np.pi/180)
-        translate_tw = np.vectorize(lambda x: max(0,x-892))
+        depot = [0,0,0,1000,0]
 
         for i in range(0,self.args['batch_size']):
             sample_X,_ = self.gaussian_generator.sample(n_samples = self.args['n_nodes']-1)
 
-            # Transform lat,long in radians
-            sample_X[:,0] = transform_radian(sample_X[:,0])
-            sample_X[:,1] = transform_radian(sample_X[:,1])
-
-            # need to format data
-            sample_X[:,4] = intfunct(sample_X[:,4])     # make sure that demand is integer
-            sample_X[:,2] = check_TW_begin(sample_X[:,2],sample_X[:,3])
-            sample_X[:,2] = translate_tw(sample_X[:,2])
-            sample_X[:,3] = translate_tw(sample_X[:,3])
-            sample_X[:,3] = check_TW_end(sample_X[:,3])
-
             # concatenate depot
             final_data = np.append(sample_X,[depot],axis=0)
-
             input_data.append(final_data)
 
-        return input_data
 
+        return input_data
 
 
     def get_test_next(self):
@@ -162,7 +132,6 @@ class DataGenerator(object):
         Get all test problems
         '''
         return self.test_data
-
 
 
 class State(collections.namedtuple("State",
@@ -245,7 +214,7 @@ class Env(object):
         # load: [batch_size * beam_width]
         self.load = tf.ones([self.batch_beam])*self.capacity
         #self.time = tf.expand_dims(tf.zeros([self.batch_beam]),1)
-        self.time = tf.zeros([self.batch_beam]) # cf departure time at 892
+        self.time = tf.zeros([self.batch_beam])
 
         # create mask
         self.mask = tf.zeros([self.batch_size*beam_width,self.n_nodes],
@@ -263,7 +232,6 @@ class Env(object):
 
         return state
 
-
     def step(self,
              idx,
              beam_parent=None):
@@ -271,6 +239,7 @@ class Env(object):
         runs one step of the environment and updates demands, loads and masks
         '''
 
+        inverse_speed = 1/0.1567
         # if the environment is used in beam search decoder
         if beam_parent is not None:
             # BatchBeamSeq: [batch_size*beam_width x 1]
@@ -318,9 +287,7 @@ class Env(object):
         visited_x = tf.expand_dims(visited_x,1)
         visited_y = tf.gather_nd(self.all_y,batched_idx)
         visited_y = tf.expand_dims(visited_y,1)
-        interm = tf.multiply((visited_y - self.previous_y), tf.cos(0.5 * (visited_x + self.previous_x)))
-        d_traveled = 6371 * tf.sqrt(tf.square(interm) + tf.square(visited_x - self.previous_x))     # 6371 is the radius (km of the earth)
-        t_spent = (100/13) * 1.2 * d_traveled     # We assume 13 km/h and 100 is to obtained click. 1.2 is the circuity fator
+        t_spent = tf.scalar_mul(inverse_speed,tf.sqrt(tf.square(self.previous_x - visited_x) + tf.square(self.previous_y - visited_y)))
         t_spent = tf.squeeze(t_spent,[1])
 
         # update the previous location
@@ -329,8 +296,6 @@ class Env(object):
 
         # update time, max of going there and wait
         self.time = tf.maximum(self.time + t_spent, tf.gather_nd(self.all_b_tw,batched_idx))
-        # and add service time (1.5 per package)
-        self.time = tf.add(self.time, 1.5 * d_sat)
 
         # if in depot
         depot_flag = tf.squeeze(tf.cast(tf.equal(idx,self.n_cust),tf.float32),1)
@@ -356,9 +321,7 @@ class Env(object):
         # put the previous_x y as a matrix [batchsize * n_nodes]
         matrix_x = tf.tile(self.previous_x,[1,self.n_nodes])
         matrix_y = tf.tile(self.previous_y,[1,self.n_nodes])
-        interm = tf.multiply((matrix_y - self.all_y), tf.cos(0.5 * (matrix_x + self.all_x)))
-        d_traveled = 6371 * tf.sqrt(tf.square(interm) + tf.square(matrix_x - self.all_x))     # 6371 is the radius (km of the earth)
-        travel_time = (100/13) * 1.2 * d_traveled
+        travel_time = tf.scalar_mul(inverse_speed,tf.sqrt(tf.square(matrix_x - self.all_x) + tf.square(matrix_y - self.all_y)))
         self.time = tf.expand_dims(self.time,1)
         arrival_time = tf.tile(self.time, [1,self.n_nodes]) + travel_time
 
@@ -417,14 +380,14 @@ def reward_func(sample_solution, decode_len=0.0, n_nodes=0.0, depot=None):
 
     sample_solution_tilted = tf.concat((tf.expand_dims(sample_solution[-1],0),
          sample_solution[:-1]),0)
-
     # get the reward based on the route lengths
-    interm_decoded = tf.multiply((sample_solution_tilted[:,:,1] - sample_solution[:,:,1]),tf.cos(tf.scalar_mul(0.5, (sample_solution_tilted[:,:,0] + sample_solution[:,:,0]))))
-    distance_decoded = tf.scalar_mul(6371, tf.sqrt(tf.square(interm_decoded) + tf.square(sample_solution_tilted[:,:,0] - sample_solution[:,:,0])))
-    route_lens_decoded = tf.reduce_sum(distance_decoded,0)
+
+    route_lens_decoded = tf.reduce_sum(tf.pow(tf.reduce_sum(tf.pow(\
+        (sample_solution_tilted - sample_solution) ,2), 2) , .5), 0)
 
     if not depot is None:
-        reward = tf.add(tf.scalar_mul(70.0,tf.scalar_mul(1.0/n_nodes,depot_visits)),tf.scalar_mul(30.0,tf.divide(route_lens_decoded,max_lens_decoded)))
+        # reward = tf.add(tf.scalar_mul(70.0,tf.scalar_mul(1.0/n_nodes,depot_visits)),tf.scalar_mul(30.0,tf.divide(route_lens_decoded,max_lens_decoded)))
+        reward = tf.add(tf.scalar_mul(100.0,depot_visits),route_lens_decoded)
         return reward
     else:
         return route_lens_decoded

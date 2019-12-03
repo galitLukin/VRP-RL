@@ -26,13 +26,16 @@ def load_task_specific_components(task,ups):
     elif task == 'vrptw':
         if ups:
             from UPS.vrptw_ups_utils import DataGenerator,Env,reward_func
-            from UPS.vrptw_ups_attention import AttentionVRPTWActor, AttentionVRPTWCritic
+            from UPS.vrptw_ups_attention import AttentionVRPTW_UPS_Actor, AttentionVRPTW_UPS_Critic
+
+            AttentionActor = AttentionVRPTW_UPS_Actor
+            AttentionCritic = AttentionVRPTW_UPS_Critic
         else:
             from VRPTW.vrptw_utils import DataGenerator,Env,reward_func
             from VRPTW.vrptw_attention import AttentionVRPTWActor, AttentionVRPTWCritic
 
-        AttentionActor = AttentionVRPTWActor
-        AttentionCritic = AttentionVRPTWCritic
+            AttentionActor = AttentionVRPTWActor
+            AttentionCritic = AttentionVRPTWCritic
 
     else:
         raise Exception('Task is not implemented')

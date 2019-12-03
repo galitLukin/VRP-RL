@@ -1,7 +1,7 @@
 
 import tensorflow as tf
 
-class AttentionVRPTWActor(object):
+class AttentionVRPTW_UPS_Actor(object):
     """A generic attention module for the attention in vrptw model"""
     def __init__(self, dim, use_tanh=False, C=10,_name='Attention',_scope=''):
         self.use_tanh = use_tanh
@@ -84,7 +84,7 @@ class AttentionVRPTWActor(object):
         return e, logits
 
 
-class AttentionVRPTWCritic(object):
+class AttentionVRPTW_UPS_Critic(object):
     """A generic attention module for the attention in vrp model"""
     def __init__(self, dim, use_tanh=False, C=10,_name='Attention',_scope=''):
 
