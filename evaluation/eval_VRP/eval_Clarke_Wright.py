@@ -7,8 +7,8 @@ class EvalClarkeWright(evaluator.RoutingEvaluator):
 
     def __init__(self,args,env,prt,min_veh):
         super(EvalClarkeWright,self).__init__(args,env,prt,min_veh)
-
-        self._update_filename('Clarke_Wright')
+        self.name = 'Clarke_Wright'
+        self._update_filename(self.name)
 
 
     def _route_creator(self, manager):

@@ -127,7 +127,7 @@ class GoogleSolverTW(object):
         for node in range(1, len(data['distance_matrix'])):
             routing.AddDisjunction([manager_model.NodeToIndex(node)], penalty)
 
-        penalty_veh = self.multiplier * 200     # would need to put 500 nodes in a vehicle to balance
+        penalty_veh = self.multiplier * 500     # would need to put 500 nodes in a vehicle to balance
         for i in range(data['num_vehicles']):
             routing.AddVariableMinimizedByFinalizer(
                 time_dimension.CumulVar(routing.Start(i)))

@@ -84,6 +84,9 @@ class Benchmark(object):
                 if not route_created.check_feasible_tw():
                     print("route infeasible ", ev)
                     #assert False
+
+            if route_created.nb_stops != self.env.n_nodes -1:
+                print("pb in route ",ev, " number stop ", route_created.nb_stops)
             list_routes.append(route_created)
             line = input_file.readline()
 

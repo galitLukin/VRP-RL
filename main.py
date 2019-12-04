@@ -17,11 +17,19 @@ def load_task_specific_components(task,ups):
     This function load task-specific libraries
     '''
     if task == 'vrp':
-        from VRP.vrp_utils import DataGenerator,Env,reward_func
-        from VRP.vrp_attention import AttentionVRPActor,AttentionVRPCritic
+        if ups:
+            from UPS.vrp_ups_utils import DataGenerator,Env,reward_func
+            from UPS.vrp_ups_attention import AttentionVRP_UPS_Actor, AttentionVRP_UPS_Critic
 
-        AttentionActor = AttentionVRPActor
-        AttentionCritic = AttentionVRPCritic
+            AttentionActor = AttentionVRP_UPS_Actor
+            AttentionCritic = AttentionVRP_UPS_Critic
+
+        else:
+            from VRP.vrp_utils import DataGenerator,Env,reward_func
+            from VRP.vrp_attention import AttentionVRPActor,AttentionVRPCritic
+
+            AttentionActor = AttentionVRPActor
+            AttentionCritic = AttentionVRPCritic
 
     elif task == 'vrptw':
         if ups:
@@ -148,7 +156,7 @@ def main(args, prt):
         all_evaluator = load_task_specific_eval(args['task_name'])
 
         # perform the evaluation
-        list_eval = ['greedy','beam_search']
+        list_eval = ['beam_search'] #['greedy','beam_search']
         for eval_tuple in all_evaluator:
             list_eval.append(eval_tuple[1])
 
@@ -156,6 +164,8 @@ def main(args, prt):
             object_eval.perform_routing()
 
         benchmark_object = benchmark.Benchmark(args,env,prt)
+        list_eval.remove('or_tools_tw')
+        #list_eval.remove('I1_heuristic')
         benchmark_object.perform_benchmark(list_eval=list_eval)
 
     prt.print_out('Total time is {}'.format(time.strftime("%H:%M:%S", time.gmtime(time.time()-start_time))))
@@ -168,7 +178,7 @@ if __name__ == "__main__":
     # args['is_train'] = False
     # args['infer_type'] = 'single'
     # args['test_size'] = 1000
-    # args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrptw50-2019-11-26_13-46-02/model/"
+    # args['load_path'] = "/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/VRP-RL/logs/vrptw20-NB-TRUCK/model/"
 
     # args['data_dir'] = "drive/My Drive/VRP-RL/data"
     # args['log_dir'] = "drive/My Drive/VRP-RL/logs"

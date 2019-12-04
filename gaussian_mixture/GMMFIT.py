@@ -8,11 +8,14 @@ import joblib
 
 ev = "cvrptw"
 df = pd.read_csv("/Users/jpoullet/Documents/MIT/Thesis/ML6867_project/data_UPS/list_tuesday_Central_area_" + ev +".csv")
+print(df.columns)
+df = df.drop(columns=['Latitude', 'Longitude','service_time','Start Commit Time','End Commit Time'])
+print(df.columns)
 X = df.to_numpy()
 print(X)
 
 # fit a Gaussian Mixture Model, n_components corresponds to K
-clf = mixture.GaussianMixture(n_components=10, covariance_type='full')
+clf = mixture.GaussianMixture(n_components=13, covariance_type='full')
 clf.fit(X)
 
 # output the mixture
@@ -24,8 +27,8 @@ clf = joblib.load( ev + '.joblib')
 #Sample generation. Labels are not useful for us, they refer to the gaussian component used to generate sample
 sample_X, _ = clf.sample(n_samples=1000)
 print(sample_X)
-
 assert False
+
 maxK = 20
 bicscore = np.zeros(maxK)
 for i in range(0,maxK):
