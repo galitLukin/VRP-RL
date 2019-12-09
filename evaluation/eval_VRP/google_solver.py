@@ -102,12 +102,19 @@ class GoogleSolver(object):
             'Capacity')
 
         if self.min_veh:
-            penalty_veh = self.multiplier * 100000
+            penalty_veh = self.multiplier * 1000
             for i in range(data['num_vehicles']):
                 routing.SetFixedCostOfVehicle(penalty_veh, i)
+
+        # Allow to drop nodes.
+        penalty = self.multiplier * 100000
+        for node in range(1, len(data['distance_matrix'])):
+            routing.AddDisjunction([manager_model.NodeToIndex(node)], penalty)
+
         # Setting first solution heuristic.
         search_parameters = pywrapcp.DefaultRoutingSearchParameters()
         search_parameters.first_solution_strategy = routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
+        search_parameters.time_limit.seconds = 10
 
         # Solve the problem.
         assignment = routing.SolveWithParameters(search_parameters)

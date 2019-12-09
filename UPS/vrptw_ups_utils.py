@@ -34,12 +34,11 @@ def create_VRPTW_UPS_dataset(
     # build task name and datafiles
     task_name = 'vrptw-ups-size-{}-len-{}-{}.txt'.format(n_problems, n_nodes,data_type)
     fname = os.path.join(data_dir, task_name)
-
-   # cteate/load data
+    # cteate/load data
     if os.path.exists(fname):
         print('Loading dataset for {}...'.format(task_name))
         data = np.loadtxt(fname,delimiter=' ')
-        data = data.reshape(-1, n_nodes,5)
+        data = data.reshape(-1, n_nodes,3)
     else:
         print('Creating dataset for {}...'.format(task_name))
 

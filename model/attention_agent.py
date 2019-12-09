@@ -384,7 +384,10 @@ class RLAgent(object):
 
         task = self.args['task_name']
         # build task name and datafiles
-        task_name = '{}-size-{}-len-{}-results-{}.txt'.format(task,self.args['test_size'], self.env.n_nodes,eval_type)
+        if self.args['ups']:
+            task_name = '{}-ups-size-{}-len-{}-results-{}.txt'.format(task,self.args['test_size'], self.env.n_nodes,eval_type)
+        else:
+            task_name = '{}-size-{}-len-{}-results-{}.txt'.format(task,self.args['test_size'], self.env.n_nodes,eval_type)
         fname = os.path.join(self.args['log_dir'],'results', task_name)
 
         input_file =open(fname, 'w')
@@ -417,7 +420,10 @@ class RLAgent(object):
         input_file.close()
 
         # copy the input file
-        copy_name = '{}-size-{}-len-{}-test.txt'.format(task,self.args['test_size'], self.env.n_nodes)
+        if self.args['ups']:
+            copy_name = '{}-ups-size-{}-len-{}-test.txt'.format(task,self.args['test_size'], self.env.n_nodes)
+        else:
+            copy_name = '{}-size-{}-len-{}-test.txt'.format(task,self.args['test_size'], self.env.n_nodes)
         old_loc = os.path.join(self.args['data_dir'], copy_name)
         new_loc = os.path.join(self.args['log_dir'],'results', copy_name)
         copyfile(old_loc,new_loc)

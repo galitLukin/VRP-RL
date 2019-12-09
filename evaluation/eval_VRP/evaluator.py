@@ -21,7 +21,10 @@ class RoutingEvaluator(object):
         :return: the name of the output file
         """
          # build task name and datafiles
-        task_name = 'vrp-size-{}-len-{}-results-{}.txt'.format(self.args['test_size'], self.env.n_nodes,benchmark_type)
+        if self.args['ups']:
+            task_name = 'vrp-ups-size-{}-len-{}-results-{}.txt'.format(self.args['test_size'], self.env.n_nodes,benchmark_type)
+        else:
+            task_name = 'vrp-size-{}-len-{}-results-{}.txt'.format(self.args['test_size'], self.env.n_nodes,benchmark_type)
         fname = os.path.join(self.args['log_dir'],'results', task_name)
 
         self.output_file = fname
@@ -34,7 +37,10 @@ class RoutingEvaluator(object):
         list_manager = []
 
         # file
-        data_name = 'vrp-size-{}-len-{}-test.txt'.format(self.args['test_size'], self.env.n_nodes)
+        if self.args['ups']:
+            data_name = 'vrp-ups-size-{}-len-{}-test.txt'.format(self.args['test_size'], self.env.n_nodes)
+        else:
+            data_name = 'vrp-size-{}-len-{}-test.txt'.format(self.args['test_size'], self.env.n_nodes)
         data_loc = os.path.join(self.args['data_dir'], data_name)
 
         data_file =open(data_loc, 'r')
@@ -47,12 +53,23 @@ class RoutingEvaluator(object):
         return list_manager
 
 
+    def _check_manager_stop(self,list_manager_stop):
+        """
+        Check that every stop fit the capacity of the truck, if not then divide it into two parts
+        :return: nothing but update the list_manager_stop
+        """
+        cap = self.env.capacity
+        for manager in list_manager_stop:
+            manager.check_capacity(cap)
+
+
     def perform_routing(self):
         """
         Main function of the class, perform the routing on all the tests sets
         Write result in a new file
         """
         list_manager = self._load_manager_stops()
+        self._check_manager_stop(list_manager)
         list_results = []
         time_beg = time.time()
         for manager in list_manager:

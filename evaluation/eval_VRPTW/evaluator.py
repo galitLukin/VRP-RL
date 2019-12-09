@@ -49,12 +49,23 @@ class RoutingEvaluator(object):
         return list_manager
 
 
+    def _check_manager_stop(self,list_manager_stop):
+        """
+        Check that every stop fit the capacity of the truck, if not then divide it into two parts
+        :return: nothing but update the list_manager_stop
+        """
+        cap = self.env.capacity
+        for manager in list_manager_stop:
+            manager.check_capacity(cap)
+
+
     def perform_routing(self):
         """
         Main function of the class, perform the routing on all the tests sets
         Write result in a new file
         """
         list_manager = self._load_manager_stops()
+        self._check_manager_stop(list_manager)
 
         list_results = []
         time_beg = time.time()

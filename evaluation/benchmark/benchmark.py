@@ -68,7 +68,10 @@ class Benchmark(object):
         # build task name and datafiles
         task = self.args['task_name']
 
-        task_name = '{}-size-{}-len-{}-results-{}.txt'.format(task,self.args['test_size'], self.env.n_nodes,ev)
+        if self.args['ups']:
+            task_name = '{}-ups-size-{}-len-{}-results-{}.txt'.format(task,self.args['test_size'], self.env.n_nodes,ev)
+        else:
+            task_name = '{}-size-{}-len-{}-results-{}.txt'.format(task,self.args['test_size'], self.env.n_nodes,ev)
         fname = os.path.join(self.args['log_dir'],'results', task_name)
 
         input_file =open(fname, 'r')

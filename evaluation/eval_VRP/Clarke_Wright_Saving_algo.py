@@ -12,6 +12,7 @@ class ClarkeWrightSolver(object):
         self.matrix_dist = self._build_dist_matrix()
         self.current_route = dict()
 
+
     def _build_dist_matrix(self):
         """
         Build the distance matrix between every stop and the depot
@@ -65,13 +66,15 @@ class ClarkeWrightSolver(object):
             for route2_guid in self.current_route:
                 if route2_guid != route1_guid:
                     route2 = self.current_route[route2_guid]
-                    stop2 = route2.first_stop
+                    # check feasibility
+                    if route1.demand + route2.demand <= self.env.capacity:
+                        stop2 = route2.first_stop
 
-                    saving = self.matrix_dist[stop1.guid][self.manager_stop.depot.guid] + self.matrix_dist[self.manager_stop.depot.guid][stop2.guid] +\
-                        self.matrix_dist[stop1.guid][stop2.guid]
+                        saving = self.matrix_dist[stop1.guid][self.manager_stop.depot.guid] + self.matrix_dist[self.manager_stop.depot.guid][stop2.guid] +\
+                            self.matrix_dist[stop1.guid][stop2.guid]
 
-                    id_couple = route1_guid + "-" + route2_guid
-                    list_savings.append((saving, id_couple))
+                        id_couple = route1_guid + "-" + route2_guid
+                        list_savings.append((saving, id_couple))
 
         return list_savings
 
@@ -125,11 +128,9 @@ class ClarkeWrightSolver(object):
             for tuple_saving in current_list_savings:
                 route_1,route_2 = self._get_route_from_tuple(tuple_saving[1])
 
-                # check feasibility
-                if route_1.demand + route_2.demand <= self.env.capacity:
-                    route_1.merge_with_another_route(route_2)
-                    del self.current_route[route_2.guid]
-                    break
+                route_1.merge_with_another_route(route_2)
+                del self.current_route[route_2.guid]
+                break
 
             else:
                 # we have not break thus no changes

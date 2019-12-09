@@ -35,3 +35,19 @@ class ManagerStopTW(managerStops.managerStops):
         return mana
 
 
+    def _create_stop_from_stop(self,stop_copied, demand):
+        """
+        Create a new stop from the one to be copied, except for the demand
+        :param stop_copied:
+        :param demand:
+        :return:
+        """
+        new_guid = self._create_guid()
+        self[new_guid] = stop_tw.StopTW(guid=new_guid,
+                                   x=stop_copied.x,
+                                   y=stop_copied.y,
+                                   demand=demand,
+                                        begin_tw=stop_copied.begin_tw,
+                                        end_tw= stop_copied.end_tw)
+
+
