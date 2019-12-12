@@ -38,18 +38,26 @@ def create_VRPTW_UPS_dataset(
     if os.path.exists(fname):
         print('Loading dataset for {}...'.format(task_name))
         data = np.loadtxt(fname,delimiter=' ')
-        data = data.reshape(-1, n_nodes,3)
+        data = data.reshape(-1, n_nodes,5)
     else:
         print('Creating dataset for {}...'.format(task_name))
-
+        speed = 0.1567
         intfunct = np.vectorize(lambda x : max(1,np.round(x)))
+        check_TW_begin = np.vectorize(lambda x,y : x if x < y else y - 50*speed )
+        check_TW_end = np.vectorize(lambda x: min(x,(1000-50)*speed))  # ensures
+        translate_tw = np.vectorize(lambda x: max(0,x * speed))
+
         # Generate a training set of size n_problems
         data = []
-        depot = [0,0,0,1000,0]
+        depot = [0,0,0,1000 * speed,0]
 
         for i in range(0,n_problems):
             sample_X,_ = generator.sample(n_samples = n_cust)
             sample_X[:,4] = intfunct(sample_X[:,4])
+            sample_X[:,2] = translate_tw(sample_X[:,2])
+            sample_X[:,3] = translate_tw(sample_X[:,3])
+            sample_X[:,2] = check_TW_begin(sample_X[:,2],sample_X[:,3])
+            sample_X[:,3] = check_TW_end(sample_X[:,3])
 
             # concatenate depot
             final_data = np.append(sample_X,[depot],axis=0)
@@ -100,12 +108,21 @@ class DataGenerator(object):
             input_data: data with shape [batch_size x max_time x 5]
         '''
         input_data = []
+        speed = 0.1567
         intfunct = np.vectorize(lambda x : max(1,np.round(x)))
-        depot = [0,0,0,1000,0]
+        check_TW_begin = np.vectorize(lambda x,y : x if x < y else y - 50*speed )
+        check_TW_end = np.vectorize(lambda x: min(x,(1000-50)*speed))  # ensures
+        translate_tw = np.vectorize(lambda x: max(0,x * speed))
+
+        depot = [0,0,0,1000* speed,0]
 
         for i in range(0,self.args['batch_size']):
             sample_X,_ = self.gaussian_generator.sample(n_samples = self.args['n_nodes']-1)
             sample_X[:,4] = intfunct(sample_X[:,4])
+            sample_X[:,2] = translate_tw(sample_X[:,2])
+            sample_X[:,3] = translate_tw(sample_X[:,3])
+            sample_X[:,2] = check_TW_begin(sample_X[:,2],sample_X[:,3])
+            sample_X[:,3] = check_TW_end(sample_X[:,3])
 
             # concatenate depot
             final_data = np.append(sample_X,[depot],axis=0)
@@ -242,7 +259,6 @@ class Env(object):
         runs one step of the environment and updates demands, loads and masks
         '''
 
-        inverse_speed = 1/0.1567
         # if the environment is used in beam search decoder
         if beam_parent is not None:
             # BatchBeamSeq: [batch_size*beam_width x 1]
@@ -290,7 +306,8 @@ class Env(object):
         visited_x = tf.expand_dims(visited_x,1)
         visited_y = tf.gather_nd(self.all_y,batched_idx)
         visited_y = tf.expand_dims(visited_y,1)
-        t_spent = tf.scalar_mul(inverse_speed,tf.sqrt(tf.square(self.previous_x - visited_x) + tf.square(self.previous_y - visited_y)))
+        #t_spent = tf.scalar_mul(inverse_speed,tf.sqrt(tf.square(self.previous_x - visited_x) + tf.square(self.previous_y - visited_y)))
+        t_spent = tf.sqrt(tf.square(self.previous_x - visited_x) + tf.square(self.previous_y - visited_y))
         t_spent = tf.squeeze(t_spent,[1])
 
         # update the previous location
@@ -324,7 +341,8 @@ class Env(object):
         # put the previous_x y as a matrix [batchsize * n_nodes]
         matrix_x = tf.tile(self.previous_x,[1,self.n_nodes])
         matrix_y = tf.tile(self.previous_y,[1,self.n_nodes])
-        travel_time = tf.scalar_mul(inverse_speed,tf.sqrt(tf.square(matrix_x - self.all_x) + tf.square(matrix_y - self.all_y)))
+        #travel_time = tf.scalar_mul(inverse_speed,tf.sqrt(tf.square(matrix_x - self.all_x) + tf.square(matrix_y - self.all_y)))
+        travel_time = tf.sqrt(tf.square(matrix_x - self.all_x) + tf.square(matrix_y - self.all_y))
         self.time = tf.expand_dims(self.time,1)
         arrival_time = tf.tile(self.time, [1,self.n_nodes]) + travel_time
 
